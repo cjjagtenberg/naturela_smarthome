@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sediakan Naturela Smarthome",
+        "description": "Masukkan kelayakan anda untuk {url}",
+        "data": {
+          "username": "Alamat e-mel",
+          "password": "Kata laluan",
+          "device_id": "ID Peranti (dari URL: /device/burnertouch/{id})",
+          "scan_interval": "Selang pengundian (saat, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Tidak dapat bersambung ke iot.naturela-bg.com",
+      "invalid_auth": "Kelayakan tidak sah",
+      "unknown": "Ralat tidak dijangka"
+    },
+    "abort": {
+      "already_configured": "Peranti ini sudah dikonfigurasi"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Naturela Smarthome সেটআপ করুন",
+        "description": "{url} এর জন্য আপনার লগইন তথ্য দিন",
+        "data": {
+          "username": "ইমেইল ঠিকানা",
+          "password": "পাসওয়ার্ড",
+          "device_id": "ডিভাইস আইডি (URL থেকে: /device/burnertouch/{id})",
+          "scan_interval": "পোলিং ইন্টারভাল (সেকেন্ড, সর্বনিম্ন ১০)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "iot.naturela-bg.com এ সংযোগ করা সম্ভব নয়",
+      "invalid_auth": "অবৈধ লগইন তথ্য",
+      "unknown": "অপ্রত্যাশিত ত্রুটি"
+    },
+    "abort": {
+      "already_configured": "এই ডিভাইসটি ইতিমধ্যে কনফিগার করা হয়েছে"
+    }
+  }
+}

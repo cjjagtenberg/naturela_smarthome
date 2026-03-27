@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurar Naturela Smarthome",
+        "description": "Insira as suas credenciais para {url}",
+        "data": {
+          "username": "Endereço de e-mail",
+          "password": "Palavra-passe",
+          "device_id": "ID do dispositivo (a partir do URL: /device/burnertouch/{id})",
+          "scan_interval": "Intervalo de sondagem (segundos, mín. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Não é possível ligar a iot.naturela-bg.com",
+      "invalid_auth": "Credenciais inválidas",
+      "unknown": "Erro inesperado"
+    },
+    "abort": {
+      "already_configured": "Este dispositivo já está configurado"
+    }
+  }
+}

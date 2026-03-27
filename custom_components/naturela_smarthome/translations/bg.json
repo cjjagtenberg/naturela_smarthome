@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Настройка на Naturela Smarthome",
+        "description": "Въведете вашите идентификационни данни FpA {url}",
+        "data": {
+          "username": "Имейл адреса",
+          "password": "Парола",
+          "device_id": "ID на устройството (от URL: /device/burnertouch/{id})",
+          "scan_interval": "Интервал на опитване (секунди, мин. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Не може да се свърже с cub.naturela-bg.com",
+      "invalid_auth": "Невалидни идентификации данни",
+      "unknown": "Неочаквана грешка"
+    },
+    "abort": {
+      "already_configured": "Това устройство вече е konfigurirano"
+    }
+  }
+}

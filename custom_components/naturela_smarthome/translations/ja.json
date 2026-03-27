@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Naturela Smarthome のセットアップ",
+        "description": "{url} のログイン情報を入力してください",
+        "data": {
+          "username": "メールアドレス",
+          "password": "パスワード",
+          "device_id": "デバイス ID（URL から: /device/burnertouch/{id}）",
+          "scan_interval": "ポーリング間隔（秒、最低 10）"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "iot.naturela-bg.com に接続できません",
+      "invalid_auth": "認証情報が無効です",
+      "unknown": "予期しないエラー"
+    },
+    "abort": {
+      "already_configured": "このデバイスはすてに設定されています"
+    }
+  }
+}

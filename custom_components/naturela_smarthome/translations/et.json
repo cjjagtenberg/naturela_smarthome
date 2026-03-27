@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Seadista Naturela Smarthome",
+        "description": "Sisesta oma sisselogimisandmed {url} jaoks",
+        "data": {
+          "username": "E-posti aadress",
+          "password": "Parool",
+          "device_id": "Seadme ID (URL-ist: /device/burnertouch/{id})",
+          "scan_interval": "Päringuintervall (sekundit, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Ühendamine iot.naturela-bg.com-iga ebaõnnestus",
+      "invalid_auth": "Kehtetud sisselogimisandmed",
+      "unknown": "Ootamatu viga"
+    },
+    "abort": {
+      "already_configured": "See seade on juba konfigureeritud"
+    }
+  }
+}

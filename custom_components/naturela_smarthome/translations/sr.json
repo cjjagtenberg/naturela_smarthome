@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Podešavanje Naturela Smarthome",
+        "description": "Unesite svoje akreditive za {url}",
+        "data": {
+          "username": "Email adresa",
+          "password": "Lozinka",
+          "device_id": "ID uređaja (iz URL-a: /device/burnertouch/{id})",
+          "scan_interval": "Interval ankete (sekunde, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nije moguće povezati se sa iot.naturela-bg.com",
+      "invalid_auth": "Nevažeći akreditivi",
+      "unknown": "Neočekivana greška"
+    },
+    "abort": {
+      "already_configured": "Ovaj uređaj je već podešen"
+    }
+  }
+}

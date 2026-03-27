@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Siapkan Naturela Smarthome",
+        "description": "Masukkan kredensial Anda untuk {url}",
+        "data": {
+          "username": "Alamat email",
+          "password": "Kata sandi",
+          "device_id": "ID Perangkat (dari URL: /device/burnertouch/{id})",
+          "scan_interval": "Interval polling (detik, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Tidak dapat terhubung ke iot.naturela-bg.com",
+      "invalid_auth": "Kredensial tidak valid",
+      "unknown": "Kesalahan tak terduga"
+    },
+    "abort": {
+      "already_configured": "Perangkat ini sudah dikonfigurasi"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Naturela Smarthome సెటప్ చేయండి",
+        "description": "{url} కోసం మీ లాగిన్ వివరాలను నమోదు చేయండి",
+        "data": {
+          "username": "ఇమెయిల్ చిరునామా",
+          "password": "పాస్వర్డ్",
+          "device_id": "పరికర ID (URL నుండి: /device/burnertouch/{id})",
+          "scan_interval": "పోలింగ్ విరామం (సెకన్లు, కనీసం 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "iot.naturela-bg.com కి కనెక్ట్ అవడం సాధ్యం కాదు",
+      "invalid_auth": "చెల్లని ఆధారపత్రాలు",
+      "unknown": "అనూహ్య లోపం"
+    },
+    "abort": {
+      "already_configured": "ఈ పరికరం ఇప్పటికే కాన్ఫిగర్ చేయబడింది"
+    }
+  }
+}

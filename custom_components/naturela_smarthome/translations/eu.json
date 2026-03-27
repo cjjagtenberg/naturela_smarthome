@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Konfiguratu Naturela Smarthome",
+        "description": "Sartu zure kredentzialak {url}-rako",
+        "data": {
+          "username": "Helbide elektronikoa",
+          "password": "Pasahitza",
+          "device_id": "Gailuaren IDa (URL-etik: /device/burnertouch/{id})",
+          "scan_interval": "Inkesta-tartea (segundoak, gut. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Ezin da iot.naturela-bg.com-era konektatu",
+      "invalid_auth": "Kredentzial baliogabeak",
+      "unknown": "Ustekabeko errorea"
+    },
+    "abort": {
+      "already_configured": "Gailu hau jada konfiguratuta dago"
+    }
+  }
+}

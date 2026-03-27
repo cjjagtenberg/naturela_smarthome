@@ -1,0 +1,25 @@
+name: Feature verzoek
+description: Stel een verbetering of nieuwe functie voor
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Welk probleem lost dit op?
+      description: Beschrijf het probleem of de beperking die je ervaart.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Gewenste oplossing
+      description: Wat zou je graag zien?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatieven overwogen
+      description: Heb je andere oplossingen geprobeerd of overwogen?

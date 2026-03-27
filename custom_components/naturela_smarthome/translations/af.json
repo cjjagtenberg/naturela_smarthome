@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Stel Naturela Smarthome op",
+        "description": "Voer jou aanmelding vir {url} in",
+        "data": {
+          "username": "E-posadres",
+          "password": "Wagwoord",
+          "device_id": "Toestel-ID (van URL: /device/burnertouch/{id})",
+          "scan_interval": "Peilinginterval (sekondes, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan nie aan iot.naturela-bg.com koppel nie",
+      "invalid_auth": "Ongeldige aanmeldbewyse",
+      "unknown": "Onverwagte fout"
+    },
+    "abort": {
+      "already_configured": "Hierdie toestel is reeds opgestel"
+    }
+  }
+}

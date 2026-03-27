@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Thiết lập Naturela Smarthome",
+        "description": "Nhập thông tin đăng nhập cho {url}",
+        "data": {
+          "username": "Ðịa chỉ email",
+          "password": "Mật khẩu",
+          "device_id": "ID thiết bị (từ URL: /device/burnertouch/{id})",
+          "scan_interval": "Khoảng thời gian thăm dò (giây, tối thiểu 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Không thể kết nối với iot.naturela-bg.com",
+      "invalid_auth": "Thông tin xác thực không hợp lệ",
+      "unknown": "Lỗi không mong muốn"
+    },
+    "abort": {
+      "already_configured": "Thiết bị này đã được cấu hình"
+    }
+  }
+}

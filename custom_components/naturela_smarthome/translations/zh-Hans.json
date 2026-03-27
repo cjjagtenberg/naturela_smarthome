@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "设置 Naturela Smarthome",
+        "description": "请输入 {url} 的登录凭据",
+        "data": {
+          "username": "电子邮件地址",
+          "password": "密码",
+          "device_id": "设备 ID（从 URL: /device/burnertouch/{id}）",
+          "scan_interval": "轮询间隔（秒，最少 10）"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "无法连接到 iot.naturela-bg.com",
+      "invalid_auth": "凭据无效",
+      "unknown": "意外错误"
+    },
+    "abort": {
+      "already_configured": "此设备已经配置"
+    }
+  }
+}

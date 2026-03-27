@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Gosod Naturela Smarthome",
+        "description": "Rhowch eich tystlythyrau ar gyfer {url}",
+        "data": {
+          "username": "Cyfeiriad e-bost",
+          "password": "Cyfrinair",
+          "device_id": "ID Dyfais (o'r URL: /device/burnertouch/{id})",
+          "scan_interval": "Cyfwng pleidleisio (eiliadau, lleiaf 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Methu cysylltu â iot.naturela-bg.com",
+      "invalid_auth": "Tystlythyrau annilys",
+      "unknown": "Gwall annisgwyl"
+    },
+    "abort": {
+      "already_configured": "Mae'r ddyfais hon eisoes wedi'i ffurfweddu"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Setja upp Naturela Smarthome",
+        "description": "Sláðu inn innskráningarupplýsingar þínar fyrir {url}",
+        "data": {
+          "username": "Netfang",
+          "password": "Lykilorð",
+          "device_id": "Tæki-ID (frá URL: /device/burnertouch/{id})",
+          "scan_interval": "Fyrirspurnarabil (sekúndur, lágm. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Get ekki tengst iot.naturela-bg.com",
+      "invalid_auth": "Ógilt lykilorð",
+      "unknown": "Óvænt villa"
+    },
+    "abort": {
+      "already_configured": "Øetta tæki er þegar stillt"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Կարգաբերել Naturela Smarthome-ը",
+        "description": "Մուտքագրեք ձեր հավատարմագրերը {url}-ի համար",
+        "data": {
+          "username": "Էլ. փոստի հասցե",
+          "password": "Գաղտնաբառ",
+          "device_id": "Սարքի ID (URL-ից՝ /device/burnertouch/{id})",
+          "scan_interval": "Հարցման ընդմիջում (վայրկյան, նվ. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Հնարավոր չէ միանալ iot.naturela-bg.com-ին",
+      "invalid_auth": "Անվավեր հավատարմագրեր",
+      "unknown": "Անսպասելի սխալ"
+    },
+    "abort": {
+      "already_configured": "Այս սարքը արդեն կարգաբերված է"
+    }
+  }
+}

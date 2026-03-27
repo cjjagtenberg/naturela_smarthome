@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Konfigurera Naturela Smarthome",
+        "description": "Ange dina inloggningsuppgifter för {url}",
+        "data": {
+          "username": "E-postadress",
+          "password": "Lösenord",
+          "device_id": "Enhets-ID (från URL: /device/burnertouch/{id})",
+          "scan_interval": "Avsökningsintervall (sekunder, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan inte ansluta till iot.naturela-bg.com",
+      "invalid_auth": "Ogiltiga inloggningsuppgifter",
+      "unknown": "Oväntat fel"
+    },
+    "abort": {
+      "already_configured": "Den här enheten är redan konfigurerad"
+    }
+  }
+}

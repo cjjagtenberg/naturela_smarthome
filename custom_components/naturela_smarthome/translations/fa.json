@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "راه‌اندازی Naturela Smarthome",
+        "description": "اطلاعات ورود خود را برای {url} وارد کنید",
+        "data": {
+          "username": "آدرس ایمیل",
+          "password": "رمز عبور",
+          "device_id": "شناسه دستگاه (از URL: /device/burnertouch/{id})",
+          "scan_interval": "فاصله نظرسنجی (ثانیه، حداقل ۱۰)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "باتتإت بـ iot.naturela-bg.com ممکن نیست",
+      "invalid_auth": "بيانات ورود نامعتبر",
+      "unknown": "خطای غیرمنتظره"
+    },
+    "abort": {
+      "already_configured": "این دستگاه قبلاً پیکربندی شده است"
+    }
+  }
+}

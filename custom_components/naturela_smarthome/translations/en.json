@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Naturela Smarthome",
+        "description": "Enter your credentials for {url}",
+        "data": {
+          "username": "Email address",
+          "password": "Password",
+          "device_id": "Device ID (from URL: /device/burnertouch/{id})",
+          "scan_interval": "Poll interval (seconds, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to iot.naturela-bg.com",
+      "invalid_auth": "Invalid credentials",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This device is already configured"
+    }
+  }
+}

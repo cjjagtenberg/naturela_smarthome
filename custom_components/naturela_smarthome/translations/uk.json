@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Налаштування Naturela Smarthome",
+        "description": "Введіть облікові дані для {url}",
+        "data": {
+          "username": "Адреса Електронної пошти",
+          "password": "Пароль",
+          "device_id": "ID пристрою (з URL: /device/burnertouch/{id})",
+          "scan_interval": "Інтервал опитування (секунди, хв. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Неможливо підключитися до iot.naturela-bg.com",
+      "invalid_auth": "Недійсні облікові дані",
+      "unknown": "Неочікувана помилка"
+    },
+    "abort": {
+      "already_configured": "Цей пристрій вже налаштовано"
+    }
+  }
+}

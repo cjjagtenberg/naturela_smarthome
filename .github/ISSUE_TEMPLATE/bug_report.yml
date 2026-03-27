@@ -1,0 +1,51 @@
+name: Bug rapport
+description: Meld een probleem met de Naturela Smarthome integratie
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bedankt voor het melden van een probleem. Vul alle velden in zodat we je snel kunnen helpen.
+
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant versie
+      placeholder: "bijv. 2024.12.0"
+    validations:
+      required: true
+
+  - type: input
+    id: integration_version
+    attributes:
+      label: Integratie versie
+      placeholder: "bijv. 1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install_method
+    attributes:
+      label: Installatiemethode
+      options:
+        - HACS
+        - Handmatig
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Beschrijving van het probleem
+      description: Wat verwachtte je, en wat gebeurde er?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevante logs
+      description: |
+        Zet de loglevel tijdelijk op debug via Instellingen → Systeem → Logboek.
+        Voeg `logger: naturela_smarthome: debug` toe aan je `configuration.yaml`.
+      render: text

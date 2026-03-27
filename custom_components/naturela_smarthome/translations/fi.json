@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Määritä Naturela Smarthome",
+        "description": "Anna kirjautumistietosi osoitteelle {url}",
+        "data": {
+          "username": "Sähköpostiosoite",
+          "password": "Salasana",
+          "device_id": "Laitteen ID (URL:stä: /device/burnertouch/{id})",
+          "scan_interval": "Kyselyväli (sekuntia, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Ei voi muodostaa yhteyttä iot.naturela-bg.com:iin",
+      "invalid_auth": "Virheelliset kirjautumistiedot",
+      "unknown": "Odottamaton virhe"
+    },
+    "abort": {
+      "already_configured": "Tämä laite on jo määritetty"
+    }
+  }
+}

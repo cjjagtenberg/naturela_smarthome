@@ -1,4 +1,10 @@
-"""Naturela Smarthome Home Assistant custom integration."""
+"""Naturela Smarthome – Home Assistant custom integration.
+
+Polls the Naturela cloud API (iot.naturela-bg.com) and exposes:
+  - climate   : on/off + target temperature
+  - sensor    : boiler temp, DHW temp, flue temp, power, fire level, …
+  - binary_sensor : CH pump, DHW pump, igniter, cleaner, thermostat, ext-stop
+"""
 from __future__ import annotations
 
 import logging
@@ -24,6 +30,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         password=entry.data["password"],
         device_id=entry.data.get(CONF_DEVICE_ID, 6548),
     )
+
+    # Verify credentials immediately so HA shows a clear error if wrong
     try:
         await api.login()
     except NaturelaAuthError as exc:

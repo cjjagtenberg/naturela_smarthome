@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nastavit Naturela Smarthome",
+        "description": "Zadejte přihlašovací údaje pro {url}",
+        "data": {
+          "username": "E-mailová adresa",
+          "password": "Heslo",
+          "device_id": "ID zařízení (z URL: /device/burnertouch/{id})",
+          "scan_interval": "Interval dotazování (sekundy, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nelze se připojit k iot.naturela-bg.com",
+      "invalid_auth": "Neplatné přihlašovací údaje",
+      "unknown": "Neočekávaná chyba"
+    },
+    "abort": {
+      "already_configured": "Toto zařízení je již nakonfigurováno"
+    }
+  }
+}

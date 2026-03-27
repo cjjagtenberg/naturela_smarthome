@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurare Naturela Smarthome",
+        "description": "Introduceți datele de autentificare pentru {url}",
+        "data": {
+          "username": "Adresă de e-mail",
+          "password": "Parolă",
+          "device_id": "ID dispozitiv (din URL: /device/burnertouch/{id})",
+          "scan_interval": "Interval de interogare (secunde, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nu se poate conecta la iot.naturela-bg.com",
+      "invalid_auth": "Date de autentificare incorecte",
+      "unknown": "Eroare neașteptată"
+    },
+    "abort": {
+      "already_configured": "Acest dispozitiv este deja configurat"
+    }
+  }
+}

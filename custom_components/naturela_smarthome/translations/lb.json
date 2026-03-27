@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Naturela Smarthome asetzen",
+        "description": "Gëtt deng Umeldedaten fir {url} an",
+        "data": {
+          "username": "E-Mailadress",
+          "password": "Passwuert",
+          "device_id": "Apparat-ID (vun URL: /device/burnertouch/{id})",
+          "scan_interval": "Ufro-Intervall (Sekonnen, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kann net mat iot.naturela-bg.com verbanne",
+      "invalid_auth": "Ongëlteg Umeldedaten",
+      "unknown": "Onerwartete Feeler"
+    },
+    "abort": {
+      "already_configured": "Dëst Apparat ass scho konfiguriert"
+    }
+  }
+}

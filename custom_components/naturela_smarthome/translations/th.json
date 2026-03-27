@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "ตั้งค่า Naturela Smarthome",
+        "description": "กรอกข้อมูลรับรองสำหรับ {url}",
+        "data": {
+          "username": "ที่อยู่อีเมล",
+          "password": "รหัสผ่าน",
+          "device_id": "รหัสอุปกรณ์ (จาก URL: /device/burnertouch/{id})",
+          "scan_interval": "ช่วงเวลาการสำรวจ (วินาที, น้อยสุด 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "ไม่สามารถเชื่อมต่อกับ iot.naturela-bg.com",
+      "invalid_auth": "ข้อมูลรับรองไม่ถูกต้อง",
+      "unknown": "เกิดข้อผิดพลาดที่ไม่คาดคิด"
+    },
+    "abort": {
+      "already_configured": "อุปกรณ์นี้ได้รับการกำหนดค่าแล้ว"
+    }
+  }
+}

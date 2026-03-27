@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Opsæt Naturela Smarthome",
+        "description": "Indtast dine loginoplysninger til {url}",
+        "data": {
+          "username": "E-mailadresse",
+          "password": "Adgangskode",
+          "device_id": "Enheds-ID (fra URL: /device/burnertouch/{id})",
+          "scan_interval": "Polling-interval (sekunder, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan ikke oprette forbindelse til iot.naturela-bg.com",
+      "invalid_auth": "Ugyldige loginoplysninger",
+      "unknown": "Uventet fejl"
+    },
+    "abort": {
+      "already_configured": "Denne enhed er allerede konfigureret"
+    }
+  }
+}

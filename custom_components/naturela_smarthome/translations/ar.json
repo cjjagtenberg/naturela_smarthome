@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "إعداد Naturela Smarthome",
+        "description": "أدخل بيانات اعتمادك لـ {url}",
+        "data": {
+          "username": "عنوان البريد الإلكتروني",
+          "password": "كلمة المرور",
+          "device_id": "معرف الجهاز (من URL: /device/burnertouch/{id})",
+          "scan_interval": "فترة الاستطلاع (ثوانٍ، الحد الأدنى 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "لا يمكن الاتصال بـ iot.naturela-bg.com",
+      "invalid_auth": "بيانات اعتماد غير صالحة",
+      "unknown": "خطأ غير متوقع"
+    },
+    "abort": {
+      "already_configured": "تم تكوين هذا الجهاز بالفعل"
+    }
+  }
+}

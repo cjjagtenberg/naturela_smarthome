@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Naturela Smarthome ஐ அமைக்கவும்",
+        "description": "{url} க்கான உங்கள் உள்நுழைவு விவரங்களை உள்ளிடவும்",
+        "data": {
+          "username": "மின்னஞ்சல் முகவரி",
+          "password": "கடவுச்சொல்",
+          "device_id": "சாதன ஐடி (URL இலிருந்து: /device/burnertouch/{id})",
+          "scan_interval": "வாக்கெடுப்பு இடைவெளி (நொடிகள், குறைந்தபட்சம் 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "iot.naturela-bg.com உடன் இணைக்க முடியவில்லை",
+      "invalid_auth": "தவறான நற்சான்றிதழ்கள்",
+      "unknown": "எதிர்பாராத பிழை"
+    },
+    "abort": {
+      "already_configured": "இந்த சாதனம் ஏற்கனவே கட்டமைக்கப்பட்டுள்ளது"
+    }
+  }
+}

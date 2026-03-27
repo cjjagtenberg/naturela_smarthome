@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ρύθμιση Naturela Smarthome",
+        "description": "Εισαγάγετε τα διαπιστευτήρια σας για {url}",
+        "data": {
+          "username": "Διεύθυνση email",
+          "password": "Κωδικός πρόσβασης",
+          "device_id": "ID συσκευής (από URL: /device/burnertouch/{id})",
+          "scan_interval": "Διάστημα δειγματοληψίας (δευτερόλεπτα, ελάχ. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Δεν είναι δυνατή η σύνδεση στο iot.naturela-bg.com",
+      "invalid_auth": "Μη έγκυρα διαπιστευτήρια",
+      "unknown": "Απροσδόκητο σφάλμα"
+    },
+    "abort": {
+      "already_configured": "Αυτή η συσκευή έχει ήτη διαμορφωθεί"
+    }
+  }
+}

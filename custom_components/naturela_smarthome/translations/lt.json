@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nustatyti Naturela Smarthome",
+        "description": "Įveskite prisijungimo duomenis {url}",
+        "data": {
+          "username": "El. pašto adresas",
+          "password": "Slaptažodis",
+          "device_id": "Įrenginio ID (iš URL: /device/burnertouch/{id})",
+          "scan_interval": "Apklausos intervalas (sekundės, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nepavyksta prisijungti prie iot.naturela-bg.com",
+      "invalid_auth": "Neteisingi prisijungimo duomenys",
+      "unknown": "Netikėta klaida"
+    },
+    "abort": {
+      "already_configured": "Šis įrenginys jau sukonfigūruotas"
+    }
+  }
+}

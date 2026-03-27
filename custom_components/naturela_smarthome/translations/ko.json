@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Naturela Smarthome 설정",
+        "description": "{url}에 로그인 자격 증명을 입력하세요",
+        "data": {
+          "username": "이메일 주소",
+          "password": "비밀번호",
+          "device_id": "기기 ID (URL에서: /device/burnertouch/{id})",
+          "scan_interval": "폴링 간격 (초, 최소 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "iot.naturela-bg.com에 연결할 수 없습니다",
+      "invalid_auth": "잘못된 자격 증명",
+      "unknown": "예상치 못한 오류"
+    },
+    "abort": {
+      "already_configured": "이 장치는 이미 구성되었습니다"
+    }
+  }
+}

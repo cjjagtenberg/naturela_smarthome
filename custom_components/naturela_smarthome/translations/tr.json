@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Naturela Smarthome'u Kur",
+        "description": "{url} için kimlik bilgilerinizi girin",
+        "data": {
+          "username": "E-posta adresi",
+          "password": "Şifre",
+          "device_id": "Cihaz Kimliği (URL'den: /device/burnertouch/{id})",
+          "scan_interval": "Yoklama aralığı (saniye, min. 10)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "iot.naturela-bg.com'a bağlanılamıyor",
+      "invalid_auth": "Geçersiz kimlik bilgileri",
+      "unknown": "Beklenmedik hata"
+    },
+    "abort": {
+      "already_configured": "Bu cihaz zaten yapılandırılmış"
+    }
+  }
+}
