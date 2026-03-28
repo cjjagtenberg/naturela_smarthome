@@ -1,221 +1,173 @@
-# Naturela Smarthome — Home Assistant Integration
+# Naturela Smarthome – Home Assistant Integratie
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![HA Version](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-blue.svg)](https://www.home-assistant.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/cjjagtenberg/naturela_smarthome)](https://github.com/cjjagtenberg/naturela_smarthome/releases)
 
-Control your **Naturela BurnerTouch pellet stove** from Home Assistant — using the existing cloud API at [iot.naturela-bg.com](https://iot.naturela-bg.com). No local modifications or hurdware needed.
-
----
-
-## 📺 Screenshot
-
-![Naturela card in Home Assistant](https://raw.githubusercontent.com/cjjagtenberg/naturela_smarthome/main/docs/screenshot.png)
+Stuur je **Naturela BurnerTouch pelletkachel** aan vanuit Home Assistant — via de bestaande cloud-API van [iot.naturela-bg.com](https://iot.naturela-bg.com). Geen lokale modificaties nodig.
 
 ---
 
-## ✅ Supported devices
+## Ondersteunde apparaten
 
-| Device | Controller | Notes |
+| Apparaat | Controller | Firmware |
 |---|---|---|
-| Naturela pellet burner | BurnerTouch (NPBC_V6T_2) | Tested with firmware ≥ 65 |
-
-> Other BurnerTouch models may work. Open an [issue](https://github.com/cjjagtenberg/naturela_smarthome/issues) if you have a different model.
+| Naturela pelletbrander | BurnerTouch (NPBC_V6T_2) | ≥ 65 |
 
 ---
 
-## 🚀 Features
+## Functies
 
-### Climate entity
-- Turn stove **on / off**
-- Set **target temperature** (30–85 °C)
-- Reports **current boiler temperature**
-- Dynamic **status colour** in the dashboard
+### Climate entiteit
+- Kachel **aan/uit** zetten
+- **Doeltemperatuur** instellen (30–85 °C)
+- Dynamische **kleurfeedback** in het dashboard:
+  - 🟡 Amber = Ontsteking bezig (status 1)
+  - 🟠 Diep-oranje = Kachel brandt (status 2 / 8)
+  - Grijs = Stand-by / Uit
 
-### Sensors
+### Sensoren
 
-| Entity | Type | Unit | Description |
+| Entiteit | Type | Eenheid | Omschrijving |
 |---|---|---|---|
-| Boiler temperature | `sensor` | °C | Current boiler water temperature |
-| Target temperature | `sensor` | °C | Current setpoint |
-| Flue gas temperature | `sensor` | °C | Chimney / flue temperature |
-| DHW temperature | `sensor` | °C | Domestic hot water boiler |
-| Power output | `sensor` | kW | Current combustion power |
-| Flame level | `sensor` | 0–5 | Combustion intensity |
-| Pellet consumption | `sensor` | kg | Total pellet usage |
-| Output level | `sensor` | % | Output power percentage |
-| Status code | `sensor` | — | Numeric status code |
+| Keteltemperatuur | `sensor` | °C | Huidig ketelwater |
+| Doeltemperatuur | `sensor` | °C | Ingestelde setpoint |
+| Rookgastemperatuur | `sensor` | °C | Schoorsteen/flue |
+| Warmwatertemperatuur | `sensor` | °C | Boiler DHW |
+| Brandertrap | `sensor` | — | Branderstand (1–5, geheel getal) |
+| Thermisch vermogen | `sensor` | kW | Werkelijk thermisch uitvermogen |
+| Vlamniveau | `sensor` | 0–5 | Brandintensiteit |
+| Pelletverbruik | `sensor` | kg | Totaal verbruik |
+| Statuscode | `sensor` | — | Numerieke statuscode |
 
-### Binary sensors
+### Binary sensoren
 
-| Entity | Description |
+| Entiteit | Omschrijving |
 |---|---|
-| CH pump | Central heating pump on/off |
-| DHW pump | Hot water pump on/off |
-| Ignition active | Ignition in progress |
-| Cleaning active | Self-clean cycle running |
+| CV-pomp | Aan/uit |
+| Warmwaterpomp | Aan/uit |
+| Ontsteking actief | Aan/uit |
+| Reiniger actief | Aan/uit |
+| Thermostaat | Invoer actief |
+| Externe stop | Invoer actief |
+
+### Statuscodes
+
+| Code | Naam | Betekenis |
+|---|---|---|
+| 0 | Stand-by | Kachel inactief |
+| 1 | Ontsteking | Opstartfase – pellets ontbranden |
+| 2 | Werkt | Normale werking |
+| 3 | Afkoelen | Nakoelfase |
+| 4 | Fout | Storing |
+| 5 | Wachten | Wacht op startsignaal |
+| 6 | Reinigen | Automatisch reinigingsprogramma |
+| 8 | Werkt | Normale werking (alternatieve code) |
 
 ---
 
-## 📦 Installation
+## Installatie
 
-### Option 1 — HACS (recommended)
+### Via HACS (aanbevolen)
 
-1. Open **HACS** → **Integrations** → click the three-dot menu (⋮) → **Custom repositories**
-2. Add `https://github.com/cjjagtenberg/naturela_smarthome` as an **Integration**
-3. Search for **"Naturela"** and click **Download**
-4. Restart Home Assistant
+1. Ga in Home Assistant naar **HACS → Integraties**
+2. Klik op de drie puntjes rechtsboven → **Aangepaste repositories**
+3. Voeg toe: `https://github.com/cjjagtenberg/naturela_smarthome` als type **Integration**
+4. Zoek op **Naturela Smarthome** en installeer
+5. **Herstart Home Assistant**
+6. Ga naar **Instellingen → Apparaten & diensten → Integratie toevoegen** → zoek **Naturela Smarthome**
 
-### Option 2 — Manual
+### Handmatig
 
-1. Download or clone this repository
-2. Copy the `custom_components/naturela_smarthome/` folder to your HA config directory:
-   ```
-   <config>/custom_components/naturela_smarthome/
-   ```
-3. Restart Home Assistant
+1. Download de map `custom_components/naturela_smarthome` uit deze repository
+2. Kopieer naar je HA-configuratiemap:
 
----
+```
+<config>/custom_components/naturela_smarthome/
+```
 
-## ⚙️ Configuration
-
-After installation and restart:
-
-1. Go to **Settings → Devices & Services → Add Integration**
-2. Search for **"Naturela"**
-3. Fill in:
-
-   | Field | Description |
-   |---|---|
-   | **Email address** | Your login email for iot.naturela-bg.com |
-   | **Password** | Your password |
-   | **Device ID** | The numeric ID from the URL when logged in: `…/device/burnertouch/`**`6548`** |
-   | **Poll interval** | How often to refresh (seconds, 10–300, default 30) |
-
-> **Finding your Device ID:** Log in at [iot.naturela-bg.com](https://iot.naturela-bg.com), click on your device, and look at the URL — the number at the end is your Device ID.
+3. **Herstart Home Assistant**
+4. Ga naar **Instellingen → Apparaten & diensten → Integratie toevoegen** → zoek **Naturela Smarthome**
 
 ---
 
-## 🎴 Lovelace Card
+## Configuratie
 
-A custom card is included for a rich one-card overview: `naturela-pellet-card.js`
+Bij het instellen vul je in:
 
-### Install the card
+| Veld | Voorbeeld | Omschrijving |
+|---|---|---|
+| E-mailadres | `naam@mail.nl` | Inloggegevens van iot.naturela-bg.com |
+| Wachtwoord | `••••••••` | Wachtwoord van iot.naturela-bg.com |
+| Apparaat-ID | `6548` | Zichtbaar in de URL: `/#/device/burnertouch/6548` |
+| Poll-interval | `30` | Verversing in seconden (standaard 30) |
 
-1. Copy `naturela-pellet-card.js` to your HA `config/www/` folder
-2. Go to **Settings → Dashboards → Resources** and add:
+---
+
+## Dashboard kaart
+
+Er is een speciale Lovelace custom card beschikbaar: [`naturela-pellet-card.js`](naturela-pellet-card.js).
+
+**Installatie:**
+1. Kopieer `naturela-pellet-card.js` naar `/config/www/` in Home Assistant
+2. Voeg toe als resource: `Instellingen → Dashboard → Resources → + Toevoegen`
    - URL: `/local/naturela-pellet-card.js`
-   - Type: **JavaScript module**
-3. Reload the browser
-
-### Add the card to your dashboard
+   - Type: JavaScript module
+3. Voeg de kaart toe aan je Lovelace dashboard:
 
 ```yaml
 type: custom:naturela-pellet-card
-title: Pellet stove
 climate_entity: climate.schuurkachel
-status_sensor: sensor.schuurkachel_status
-boiler_sensor: sensor.schuurkachel_keteltemperatuur
+temp_sensor: sensor.schuurkachel_keteltemperatuur
 flue_sensor: sensor.schuurkachel_rookgastemperatuur
-power_sensor: sensor.schuurkachel_vermogen
-flame_sensor: sensor.schuurkachel_vlamniveau
-# alarm_sensor: sensor.schuurkachel_alarm   # optional
+power_sensor: sensor.schuurkachel_thermisch_vermogen
+ch_pump_sensor: binary_sensor.schuurkachel_cv_pomp
+dhw_pump_sensor: binary_sensor.schuurkachel_warmwaterpomp
+status_sensor: sensor.schuurkachel_status
 ```
 
-The card automatically changes colour based on the stove status:
-
-| Colour | Status |
-|---|---|
-| 🟡 Amber | Igniting |
-| 🟠 Deep orange | Running / heating |
-| 🔵 Blue | Waiting |
-| 🟤 Brown | Cleaning |
-| 🔴 Red | Fault |
-| ⬛ Dark grey | Stand-by / Off |
-
----
-
-## 🌍 Translations
-
-The configuration UI is translated into **55 languages**, including all languages officially supported by Home Assistant (English, Dutch, German, French, Spanish, Italian, Polish, Portuguese, Russian, Ukrainian, Chinese (Simplified + Traditional), Japanese, Korean, and many more).
-
----
-
-## 🔧 Troubleshooting
-
-### Temperature command not working
-- Make sure the integration restarted after a code update — a **full HA restart** is required (reload config entry is not enough due to Python module caching)
-- Check the HA logs: **Settings → System → Logs** and filter on `naturela`
-
-### Status shows "unavailable"
-- Verify your credentials are correct at [iot.naturela-bg.com](https://iot.naturela-bg.com)
-- Check that your Device ID matches the URL
-
-### Encoding issues (°C displays as "Â°C")
-- Re-upload the card JS file and bump the Lovelace resource version number
-- The included file is pure ASCII — if your editor re-saves with UTF-8, HTML entities (`&deg;`) are used to avoid encoding problems
-
----
-
-## 🏗️ Architecture
+**Voorbeeld weergave:**
 
 ```
-naturela_smarthome/
-├── __init__.py          # Integration setup, DataUpdateCoordinator
-├── api.py               # Async HTTP client (login, poll, setTemp, setState)
-├── climate.py           # Climate entity (on/off, setpoint)
-├── sensor.py            # All numeric sensors
-├── binary_sensor.py     # Boolean sensors (pump, ignition, cleaning)
-├── config_flow.py       # UI configuration flow
-├── const.py             # Constants and API URLs
-├── manifest.json        # Integration metadata
-├── strings.json         # Source strings (Dutch, used as fallback)
-└── translations/        # 55 language files
-    ├── en.json
-    ├── nl.json
-    └── … (53 more)
+┌─────────────────────────────────────────┐
+│  🔥  Pellet CV-kachel      Stand-by     │
+│      Ketelwater: 42 °C  Instelling 60°C │
+│  [ Aan ]  [████ UIT ████]               │
+├──────────────┬──────────────┬─────────┤
+│ SCHOORSTEEN  │   VERMOGEN   │   POMP    │
+│    31 °C     │   17.9 kW    │  Actief   │
+├──────────────┴──────────────┴─────────┤
+│            STATUS: Stand-by             │
+└─────────────────────────────────────────┘
 ```
 
 ---
 
-## 🤝 Contributing
+## Hoe werkt het?
 
-Pull requests are welcome! Please open an issue first to discuss large changes.
+De integratie logt in op `iot.naturela-bg.com` via het normale webformulier (met CSRF-tokenextractie). Daarna wordt elke X seconden de API gepolld:
 
-- Keep the `api.py` communication layer separate from HA entities
-- All text visible in the UI must have entries in `strings.json` and `translations/`
-- Test with `hassfest` before submitting
+- **GET** `https://iot.naturela-bg.com/api/burnertouch/{device_id}` — haalt alle sensordata op
+- **POST** `https://iot.naturela-bg.com/api/burnertouch/setState` — stuurt aan/uit-commando's en temperatuurwijzigingen
 
----
-
-## 📄 License
-
-MIT — see [LICENSE](LICENSE)
+De integratie detecteert opstart via de `_command_pending` vlag: zolang de kachel nog niet in een actieve status staat na een aan-commando, wordt de UI optimistisch op "Verwarmen" gehouden zodat de gebruiker geen fout ziet.
 
 ---
 
-## 🇳🇱 Dutch / Nederlands
+## Bekende beperkingen
 
-### Installatie via HACS
+- Vereist een actieve internetverbinding (cloud-gebaseerd)
+- Timer-modus (`State = 2`) is niet instelbaar via HA
+- De exacte betekenis van sommige statusvelden is gebaseerd op reverse engineering; feedback welkom
 
-1. Open **HACS** → **Integraties** → drie-puntjes (⋮) → **Aangepaste repositories**
-2. Voeg `https://github.com/cjjagtenberg/naturela_smarthome` toe als **Integratie**
-3. Zoek naar **"Naturela"** en klik op **Downloaden**
-4. Start Home Assistant opnieuw op
+---
 
-### Configuratie
+## Bijdragen
 
-Na de installatie en herstart:
+Pull requests en issues zijn welkom op [github.com/cjjagtenberg/naturela_smarthome](https://github.com/cjjagtenberg/naturela_smarthome). Heb jij een BurnerTouch-kachel met andere statuscodes of gedrag? Open een issue!
 
-1. Ga naar **Instellingen → Apparaten en diensten → Integratie toevoegen**
-2. Zoek op **"Naturela"**
-3. Vul in:
-   - **E-mailadres** — je inloggegevens voor iot.naturela-bg.com
-   - **Wachtwoord**
-   - **Apparaat-ID** — het nummer achteraan de URL bij je apparaat: `.../device/burnertouch/`**`6548`**
-   - **Poll-interval** — verversingsfrequentie in seconden (standaard 30)
+---
 
-### Lovelace kaart
+## Licentie
 
-Kopieer `naturela-pellet-card.js` naar `config/www/`, voed de resource toe via **Instellingen → Dashboards → Bronnen**, en gebruik de YAML hierboven om de kaart toe te voegen.
+MIT — zie [LICENSE](LICENSE)
