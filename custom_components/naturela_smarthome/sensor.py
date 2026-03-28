@@ -23,6 +23,7 @@ class NaturelaSensorEntityDescription(SensorEntityDescription):
     """Extended description to carry the API field key."""
 
     api_key: str = ""
+    value_multiplier: float = 1.0
 
 
 SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
@@ -65,9 +66,9 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="power_kw",
         api_key="FPower",
-        name="Vermogen",
-        native_unit_of_measurement=UnitOfPower.KILO_WATT,
-        device_class=SensorDeviceClass.POWER,
+        name="Brandertrap",
+        native_unit_of_measurement=None,
+        device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:fire",
     ),
@@ -92,11 +93,12 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="output_power",
         api_key="OutputPower",
-        name="Uitvermogen",
-        native_unit_of_measurement="%",
-        device_class=None,
+        name="Thermisch vermogen",
+        native_unit_of_measurement=UnitOfPower.KILO_WATT,
+        device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:gauge",
+        value_multiplier=0.1,
     ),
     NaturelaSensorEntityDescription(
         key="main_fan",
@@ -153,7 +155,7 @@ class _NaturelaEntityBase(CoordinatorEntity):
 
 
 class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
-    """Human-readable status of the stove (Stand-by / Werkt / Fout ...)."""
+    """Human-readable status of the stove (Stand-by / Werkt / Fout …)."""
 
     _attr_icon = "mdi:fire-alert"
     _attr_has_entity_name = True
@@ -192,4 +194,13 @@ class NaturelaSensor(_NaturelaEntityBase, SensorEntity):
     def native_value(self):
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get(self.entity_description.api_key)
+        value = self.coordinator.data.get(self.entity_description.api_key)
+        if value is None:
+            return None
+        multiplier = self.entity_description.value_multiplier
+        if multiplier != 1.0:
+            try:
+                return round(float(value) * multiplier, 2)
+            except (TypeError, ValueError):
+                return value
+        return value
