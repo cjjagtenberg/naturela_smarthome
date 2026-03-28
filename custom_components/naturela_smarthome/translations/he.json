@@ -2,23 +2,23 @@
   "config": {
     "step": {
       "user": {
-        "title": "שברלת הומיסל Naturela Smarthome",
-        "description": "שלמי מהץטי הכניסה שלך עמו�֨ אך {url}",
+        "title": "הגדרת Naturela Smarthome",
+        "description": "הזן את אישורי הגישה שלך עבור מכשיר Naturela BurnerTouch.",
         "data": {
-          "username": "כתובת דוא\"ל",
-          "password": "ניסמה",
-          "device_id": "מזהה מכשיר (מה-URL: /device/burnertouch/{id})",
-          "scan_interval": "מרווח סקרים (שניות, מינ' 10)"
+          "username": "כתובת אימייל",
+          "password": "סיסמה",
+          "device_id": "מזהה המכשיר (מה-URL: /device/burnertouch/{id})",
+          "scan_interval": "מרווח סריקה (שניות, מינ' 10)"
         }
       }
     },
     "error": {
-      "cannot_connect": "לא ניתן להתחבר ל-iot.naturela-bg.com",
-      "invalid_auth": "פ׃יסלת הומיסה שגויים",
-      "unknown": "שגיאה בלתי צפויה"
+      "cannot_connect": "לא ניתן להתחבר אל iot.naturela-bg.com",
+      "invalid_auth": "אישורי כניסה לא תקינים",
+      "unknown": "שגיאה לא צפויה"
     },
     "abort": {
-      "already_configured": "מכשיר זה כבר מוגדר"
+      "already_configured": "המכשיר כבר מוגדר"
     }
   }
 }
