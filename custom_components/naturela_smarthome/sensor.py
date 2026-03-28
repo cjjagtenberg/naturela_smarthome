@@ -153,7 +153,7 @@ class _NaturelaEntityBase(CoordinatorEntity):
 
 
 class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
-    """Human-readable status of the stove (Stand-by / Werkt / Fout …)."""
+    """Human-readable status of the stove (Stand-by / Werkt / Fout ...)."""
 
     _attr_icon = "mdi:fire-alert"
     _attr_has_entity_name = True
@@ -167,8 +167,10 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
     def native_value(self) -> str | None:
         if not self.coordinator.data:
             return None
-        code = self.coordinator.data.get("Status", 0)
-        return STATUS_NAMES.get(code, f"Status {code}")
+        value = self.coordinator.data.get("Status")
+        if value is None:
+            return None
+        return STATUS_NAMES.get(value, str(value))
 
 
 class NaturelaSensor(_NaturelaEntityBase, SensorEntity):
