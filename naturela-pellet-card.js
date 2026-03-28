@@ -1,5 +1,5 @@
 /**
- * Naturela Pellet Stove Card  -  v9
+ * Naturela Pellet Stove Card  -  v10
  * Custom Lovelace card for the Naturela BurnerTouch pellet stove.
  *
  * Entiteiten (configureerbaar via card config):
@@ -8,7 +8,8 @@
  *   boiler_sensor   : sensor.schuurkachel_keteltemperatuur
  *   flue_sensor     : sensor.schuurkachel_rookgastemperatuur
  *   power_sensor    : sensor.schuurkachel_vermogen
- *   flame_sensor    : sensor.schuurkachel_vlamniveau
+ *   ch_pump_sensor  : binary_sensor.schuurkachel_cv_pomp
+ *   dhw_pump_sensor : binary_sensor.schuurkachel_warmwaterpomp
  *   alarm_sensor    : sensor.schuurkachel_alarm  (optioneel - storingstekst van display)
  */
 
@@ -41,7 +42,8 @@ class NaturelaPelletCard extends HTMLElement {
       boiler_sensor  : config.boiler_sensor   || 'sensor.schuurkachel_keteltemperatuur',
       flue_sensor    : config.flue_sensor     || 'sensor.schuurkachel_rookgastemperatuur',
       power_sensor   : config.power_sensor    || 'sensor.schuurkachel_vermogen',
-      flame_sensor   : config.flame_sensor    || 'sensor.schuurkachel_vlamniveau',
+      ch_pump_sensor : config.ch_pump_sensor  || 'binary_sensor.schuurkachel_cv_pomp',
+      dhw_pump_sensor: config.dhw_pump_sensor || 'binary_sensor.schuurkachel_warmwaterpomp',
       alarm_sensor   : config.alarm_sensor    || null,
       title          : config.title           || 'Pelletkachel',
     };
@@ -180,7 +182,10 @@ class NaturelaPelletCard extends HTMLElement {
     const flueUnit = this._sensorUnit(this._config.flue_sensor);
     const powVal   = this._sensorVal(this._config.power_sensor, 1);
     const powUnit  = this._sensorUnit(this._config.power_sensor);
-    const flamVal  = this._sensorVal(this._config.flame_sensor);
+    const chPumpSt  = this._stateObj(this._config.ch_pump_sensor)?.state;
+    const chPumpVal = chPumpSt === 'on' ? 'Aan' : chPumpSt === 'off' ? 'Uit' : '-';
+    const dhwPumpSt  = this._stateObj(this._config.dhw_pump_sensor)?.state;
+    const dhwPumpVal = dhwPumpSt === 'on' ? 'Aan' : dhwPumpSt === 'off' ? 'Uit' : '-';
     const statVal  = this._stateObj(this._config.status_sensor)?.state ?? color.name;
 
     const accentBg   = color.bg;
@@ -483,10 +488,14 @@ class NaturelaPelletCard extends HTMLElement {
             <div class="sensor-val">${powVal} <span class="sensor-unit">${powUnit}</span></div>
           </div>
           <div class="sensor-tile">
-            <div class="sensor-name">Vlamniveau</div>
-            <div class="sensor-val">${flamVal}</div>
+            <div class="sensor-name">CV-pomp</div>
+            <div class="sensor-val">${chPumpVal}</div>
           </div>
           <div class="sensor-tile">
+            <div class="sensor-name">WW-pomp</div>
+            <div class="sensor-val">${dhwPumpVal}</div>
+          </div>
+          <div class="sensor-tile" style="grid-column: 1 / -1;">
             <div class="sensor-name">Status</div>
             <div class="sensor-val" style="font-size:0.9rem; color:${accentBg}">${statVal}</div>
           </div>
@@ -509,7 +518,8 @@ class NaturelaPelletCard extends HTMLElement {
       boiler_sensor  : 'sensor.schuurkachel_keteltemperatuur',
       flue_sensor    : 'sensor.schuurkachel_rookgastemperatuur',
       power_sensor   : 'sensor.schuurkachel_vermogen',
-      flame_sensor   : 'sensor.schuurkachel_vlamniveau',
+      ch_pump_sensor : 'binary_sensor.schuurkachel_cv_pomp',
+      dhw_pump_sensor: 'binary_sensor.schuurkachel_warmwaterpomp',
       alarm_sensor   : '',
     };
   }
