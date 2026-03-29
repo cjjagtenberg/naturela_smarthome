@@ -118,6 +118,33 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:fan-chevron-down",
     ),
+    NaturelaSensorEntityDescription(
+        key="power1_threshold",
+        api_key="Power1",
+        name="Vermogenstrap 1",
+        native_unit_of_measurement=None,
+        device_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:speedometer-slow",
+    ),
+    NaturelaSensorEntityDescription(
+        key="power2_threshold",
+        api_key="Power2",
+        name="Vermogenstrap 2",
+        native_unit_of_measurement=None,
+        device_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:speedometer-medium",
+    ),
+    NaturelaSensorEntityDescription(
+        key="power3_threshold",
+        api_key="Power3",
+        name="Vermogenstrap 3",
+        native_unit_of_measurement=None,
+        device_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:speedometer",
+    ),
 )
 
 
@@ -155,7 +182,7 @@ class _NaturelaEntityBase(CoordinatorEntity):
 
 
 class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
-    """Human-readable status of the stove (Stand-by / Werkt / Fout …)."""
+    """Human-readable status (Stand-by / Power1 / Power2 / Power3 ...)."""
 
     _attr_icon = "mdi:fire-alert"
     _attr_has_entity_name = True
@@ -169,9 +196,21 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
     def native_value(self) -> str | None:
         if not self.coordinator.data:
             return None
-        value = self.coordinator.data.get("Status")
+        d = self.coordinator.data
+        value = d.get("Status")
         if value is None:
             return None
+        if value in (2, 8):
+            fpower = d.get("FPower") or 0
+            p3 = d.get("Power3")
+            p2 = d.get("Power2")
+            p1 = d.get("Power1")
+            if p3 is not None and fpower >= p3:
+                return "Power3"
+            if p2 is not None and fpower >= p2:
+                return "Power2"
+            if p1 is not None and fpower >= p1:
+                return "Power1"
         return STATUS_NAMES.get(value, str(value))
 
 
