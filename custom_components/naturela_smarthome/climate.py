@@ -22,7 +22,8 @@ HVAC_MODES = [HVACMode.OFF, HVACMode.HEAT]
 
 # Status codes where the stove is actively running / starting up
 # 0=Stand-by, 1=Ontsteking, 2=Werkt, 3=Afkoelen, 4=Fout, 5=Wachten, 6=Reinigen
-ACTIVE_STATUSES = {1, 2, 5, 6, 8}  # 8 = normaal werken (observed in the field)
+# String values: older firmware may return "Firing" (ignition) or "keeping" (on temp)
+ACTIVE_STATUSES = {1, 2, 5, 6, 8, "Firing", "keeping"}  # 8 = normaal werken (observed in the field)
 
 
 async def async_setup_entry(
@@ -51,7 +52,7 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
       - Target temperature control
 
     Uses optimistic state after a user command (_command_pending=True) so the
-    UI shows "Verwarmen" immediately.  The coordinator is blocked from
+    UI shows \"Verwarmen\" immediately.  The coordinator is blocked from
     resetting the mode to OFF until the stove is confirmed running
     (Status in ACTIVE_STATUSES) or the user explicitly turns it off.
     """
@@ -100,7 +101,7 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
     def _handle_coordinator_update(self) -> None:
         """Called by the coordinator after every poll.
 
-        When _command_pending is True (user just pressed "heat") we only
+        When _command_pending is True (user just pressed \"heat\") we only
         switch to OFF if the API still reports stand-by AND the state field
         is also 0.  Once the stove enters an active status we clear the flag.
         """
