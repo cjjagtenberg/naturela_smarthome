@@ -12,19 +12,16 @@ DEFAULT_SCAN_INTERVAL = 30  # seconds
 BASE_URL = "https://iot.naturela-bg.com"
 LOGIN_URL = f"{BASE_URL}/account/login"
 API_URL = f"{BASE_URL}/api/burnertouch"
-SET_STATE_URL = f"{BASE_URL}/api/burnertouch/setState"      # confirmed from web UI
-SET_TEMP_URL  = f"{BASE_URL}/api/burnertouch/setTemperature"  # confirmed from web UI
+SET_STATE_URL = f"{BASE_URL}/api/burnertouch/setState"
+SET_TEMP_URL  = f"{BASE_URL}/api/burnertouch/setTemperature"
 
-# Device state values (confirmed by capturing Naturela web UI XHR requests)
-# The web UI sends {"deviceId": "<serial>", "state": 128} for ON
-# and {"deviceId": "<serial>", "state": 0} for OFF
 STATE_OFF = 0
 STATE_ON = 128
 
-# Status codes and text values (as reported by the device)
-# Keys can be numeric codes (int) or text strings from the controller
+# Status codes (as reported by the device)
+# When Status is 2 or 8 (running), the displayed status is derived from
+# FPower vs Power1/Power2/Power3 thresholds -- see sensor.py NaturelaStatusSensor
 STATUS_NAMES = {
-    # Numerieke codes
     0: "Stand-by",
     1: "Ontsteking",
     2: "Werkt",
@@ -32,14 +29,10 @@ STATUS_NAMES = {
     4: "Fout",
     5: "Wachten",
     6: "Reinigen",
-    8: "Werkt",  # observed in the field during normal operation
-    # Tekst-waarden van de controller (Engels -> Nederlands)
+    8: "Werkt",
     "Stand by": "Stand-by",
     "Firing": "Ontsteking",
     "keeping": "Op temperatuur",
     "see display": "Zie display",
     "Ignition Fail": "Ontstekingsfout",
-    "1": "Vermogen 1",
-    "2": "Vermogen 2",
-    "3": "Vermogen 3",
 }
