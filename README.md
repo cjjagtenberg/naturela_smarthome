@@ -58,11 +58,13 @@ Stuur je **Naturela BurnerTouch pelletkachel** aan vanuit Home Assistant — via
 | 0 | Stand-by | Kachel inactief |
 | 1 | Ontsteking | Opstartfase – pellets ontbranden |
 | 2 | Werkt | Normale werking |
-| 3 | Afkoelen | Nakoelfase |
+| 3   | Ontsteking     | Opstartfase fase 2 (Igniter=True)                    |
 | 4 | Fout | Storing |
 | 5 | Wachten | Wacht op startsignaal |
 | 6 | Reinigen | Automatisch reinigingsprogramma |
 | 8 | Werkt | Normale werking (alternatieve code) |
+| 7   | Afkoelen       | Afkoelfase na afsluiting (FPower nog actief)         |
+| 10  | Op temperatuur | Eindfase afkoeling (FPower=0)                        |
 
 ---
 
@@ -153,6 +155,21 @@ De integratie logt in op `iot.naturela-bg.com` via het normale webformulier (met
 De integratie detecteert opstart via de `_command_pending` vlag: zolang de kachel nog niet in een actieve status staat na een aan-commando, wordt de UI optimistisch op "Verwarmen" gehouden zodat de gebruiker geen fout ziet.
 
 ---
+
+## Changelog
+
+### v11 (2026-04-01)
+- Card: statische headerkleur (niet langer afhankelijk van status-kleur)
+- Card: STATUS_COLORS aangevuld met statussen 3, 7 en 10
+
+### v11 (2026-03-28)
+- Card: pomptegel en thermisch vermogen samengevoegd
+- Card: power_sensor hernoemd naar thermisch_vermogen
+
+### v10 en eerder
+- Python integratie: binary sensoren toegevoegd
+- Python integratie: Firing/keeping string statussen toegevoegd aan ACTIVE_STATUSES
+- Python integratie: brandertrap-power berekening via FPower-drempels
 
 ## Bekende beperkingen
 
