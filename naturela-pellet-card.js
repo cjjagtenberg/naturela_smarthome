@@ -20,6 +20,9 @@ const STATUS_COLORS = {
   5: { bg: '#1565C0', text: '#fff', name: 'Wachten' },      // blue
   6: { bg: '#6D4C41', text: '#fff', name: 'Reinigen' },     // brown
   8: { bg: '#E64A19', text: '#fff', name: 'Werkt' },        // same as 2
+  3: { bg: '#FFA000', text: '#fff', name: 'Ontsteking' },  // amber (startup)
+  7: { bg: '#607D8B', text: '#fff', name: 'Afkoelen' },    // blue-grey
+ 10: { bg: '#2E7D32', text: '#fff', name: 'Op temp.' },    // green
 };
 const STANDBY_COLOR = { bg: '#546E7A', text: '#fff', name: 'Stand-by' };
 const OFF_COLOR     = { bg: '#37474F', text: '#aaa', name: 'Uit' };
@@ -216,9 +219,9 @@ class NaturelaPelletCard extends HTMLElement {
         align-items: center;
         gap: 10px;
         padding: 14px 16px 10px;
-        background: ${accentBg};
-        color: ${accentText};
-        transition: background 0.4s;
+        background: var(--ha-card-background, var(--card-background-color, #fff));
+        color: var(--primary-text-color, #212121);
+
       }
       .header ha-icon {
         --mdc-icon-size: 28px;
