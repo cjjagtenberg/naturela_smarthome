@@ -147,32 +147,51 @@ class NaturelaAPI:
         )
 
     async def _post_command(self, payload: dict, url: str = SET_STATE_URL) -> bool:
-        """POST a command to the given endpoint."""
+        """POST a command; re-login once if the session has expired."""
         if not self._logged_in:
             await self.login()
-
         session = await self._get_session()
-        try:
-            async with session.post(
+
+        async def _do_post():
+            return session.post(
                 url,
                 json=payload,
-                headers={"Content-Type": "application/json", "Origin": "https://iot.naturela-bg.com", "Referer": "https://iot.naturela-bg.com/"},
-            ) as resp:
+                allow_redirects=False,
+                headers={
+                    "Content-Type": "application/json",
+                    "Origin": "https://iot.naturela-bg.com",
+                    "Referer": "https://iot.naturela-bg.com/",
+                },
+            )
+
+        try:
+            async with _do_post() as resp:
+                if resp.status in (301, 302, 401, 403):
+                    # Session cookie expired — re-login and retry once
+                    _LOGGER.debug(
+                        "Session expired during command (status=%s), re-logging in",
+                        resp.status,
+                    )
+                    self._logged_in = False
+                    await self.login()
+                    async with _do_post() as resp2:
+                        success = resp2.status == 200
+                        if not success:
+                            _LOGGER.error(
+                                "Command failed after re-login: status=%s payload=%s",
+                                resp2.status, payload,
+                            )
+                        return success
                 success = resp.status == 200
                 if not success:
                     _LOGGER.error(
-                        "Command failed: status=%s, payload=%s", resp.status, payload
+                        "Command failed: status=%s payload=%s",
+                        resp.status, payload,
                     )
                 return success
         except Exception as exc:
             _LOGGER.error("Command request failed: %s", exc)
             return False
-
-    async def close(self) -> None:
-        """Close the underlying aiohttp session."""
-        if self._session and not self._session.closed:
-            await self._session.close()
-            self._session = None
 
 
 def _extract_csrf_token(html: str) -> str:
