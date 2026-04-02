@@ -52,7 +52,7 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
       - Target temperature control
 
     Uses optimistic state after a user command (_command_pending=True) so the
-    UI shows \"Verwarmen\" immediately.  The coordinator is blocked from
+    UI shows "Verwarmen" immediately.  The coordinator is blocked from
     resetting the mode to OFF until the stove is confirmed running
     (Status in ACTIVE_STATUSES) or the user explicitly turns it off.
     """
@@ -105,7 +105,7 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
     def _handle_coordinator_update(self) -> None:
         """Called by the coordinator after every poll.
 
-        When _command_pending is True (user just pressed \"heat\") we only
+        When _command_pending is True (user just pressed "heat") we only
         switch to OFF if the API still reports stand-by AND the state field
         is also 0.  Once the stove enters an active status we clear the flag.
         """
