@@ -1,7 +1,6 @@
 """Climate entity for Naturela BurnerTouch pellet stove."""
 from __future__ import annotations
 
-import datetime
 import logging
 
 from homeassistant.components.climate import (
@@ -22,12 +21,9 @@ _LOGGER = logging.getLogger(__name__)
 HVAC_MODES = [HVACMode.OFF, HVACMode.HEAT]
 
 # Status codes where the stove is actively running / starting up
-# 0=Stand-by, 1=Ontsteking, 2=Werkt, 3=Ontsteking(Igniter=True), 4=Fout, 5=Wachten, 6=Reinigen
-# String values: older firmware may return "Firing" (ignition) or "keeping" (on temp), "Burning" (heating up)
-ACTIVE_STATUSES = {1, 2, 3, 5, 6, 8, "Firing", "keeping", "Burning"}  # 3=Ontsteking(Igniter=True), 8=normaal werken
-
-# Max time to wait for stove to enter an active status after an ON command
-_COMMAND_TIMEOUT = datetime.timedelta(minutes=5)
+# 0=Stand-by, 1=Ontsteking, 2=Werkt, 3=Afkoelen, 4=Fout, 5=Wachten, 6=Reinigen
+# String values: older firmware may return "Firing" (ignition) or "keeping" (on temp)
+ACTIVE_STATUSES = {1, 2, 5, 6, 8, "Firing", "keeping"}  # 8 = normaal werken (observed in the field)
 
 
 async def async_setup_entry(
@@ -62,7 +58,11 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
     """
 
     _attr_hvac_modes = HVAC_MODES
-    _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
+    _attr_supported_features = (
+        ClimateEntityFeature.TARGET_TEMPERATURE
+        | ClimateEntityFeature.TURN_ON
+        | ClimateEntityFeature.TURN_OFF
+    )
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_min_temp = 30
     _attr_max_temp = 85
@@ -75,8 +75,6 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         self._api = api
         self._device_id = device_id
         self._command_pending = False  # True while waiting for stove to start
-        self._command_pending_since: datetime.datetime | None = None
-        self._temp_pending: float | None = None  # Optimistic temperature while API catches up
         self._attr_unique_id = f"{DOMAIN}_{device_id}_climate"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device_id))},
@@ -118,7 +116,6 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         if status in ACTIVE_STATUSES:
             # Stove is genuinely running — clear the pending flag and set HEAT
             self._command_pending = False
-            self._command_pending_since = None
             self._attr_hvac_mode = HVACMode.HEAT
         elif self._command_pending:
             # Still waiting for the stove to start — keep optimistic HEAT state
@@ -127,21 +124,6 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
                 status,
                 state,
             )
-            # Timeout: give up if stove never started within 5 minutes
-            if (
-                self._command_pending_since is not None
-                and (
-                    datetime.datetime.now(datetime.timezone.utc)
-                    - self._command_pending_since
-                    > _COMMAND_TIMEOUT
-                )
-            ):
-                _LOGGER.warning(
-                    "Command timeout: stove did not start within %s, resetting pending flag",
-                    _COMMAND_TIMEOUT,
-                )
-                self._command_pending = False
-                self._command_pending_since = None
         else:
             # No pending command — follow the API faithfully
             if state == STATE_ON:
@@ -149,16 +131,9 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
             else:
                 self._attr_hvac_mode = HVACMode.OFF
 
-        # Always update current temperature; protect target while pending
+        # Always update temperatures
         self._attr_current_temperature = data.get("TempBoiler")
-        api_temp = data.get("SetTemp")
-        if self._temp_pending is not None:
-            if api_temp is not None and abs(api_temp - self._temp_pending) < 0.5:
-                self._temp_pending = None
-                self._attr_target_temperature = api_temp
-            # else: keep optimistic value
-        else:
-            self._attr_target_temperature = api_temp
+        self._attr_target_temperature = data.get("SetTemp")
 
         if self.hass is not None:
             self.async_write_ha_state()
@@ -196,7 +171,6 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         """Turn stove on or off."""
         if hvac_mode == HVACMode.HEAT:
             self._command_pending = True
-            self._command_pending_since = datetime.datetime.now(datetime.timezone.utc)
         else:
             self._command_pending = False
 
@@ -207,9 +181,7 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         state = STATE_ON if hvac_mode == HVACMode.HEAT else STATE_OFF
         try:
             success = await self._api.set_state(state)
-            if success:
-                await self.coordinator.async_request_refresh()
-            else:
+            if not success:
                 _LOGGER.error("Failed to set HVAC mode to %s", hvac_mode)
                 self._command_pending = False
                 await self.coordinator.async_request_refresh()
@@ -218,22 +190,24 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
             self._command_pending = False
             await self.coordinator.async_request_refresh()
 
+    async def async_turn_on(self) -> None:
+        """Turn the stove on (shortcut used by climate.turn_on service)."""
+        await self.async_set_hvac_mode(HVACMode.HEAT)
+
+    async def async_turn_off(self) -> None:
+        """Turn the stove off (shortcut used by climate.turn_off service)."""
+        await self.async_set_hvac_mode(HVACMode.OFF)
+
     async def async_set_temperature(self, **kwargs) -> None:
         """Set a new target temperature."""
         temperature = kwargs.get("temperature")
         if temperature is None:
             return
-        # Optimistic update — show new temp immediately so +/- buttons don't flicker
-        self._temp_pending = temperature
-        self._attr_target_temperature = temperature
-        self.async_write_ha_state()
         try:
             success = await self._api.set_temperature(temperature)
             if success:
                 await self.coordinator.async_request_refresh()
             else:
                 _LOGGER.error("Failed to set temperature to %s", temperature)
-                self._temp_pending = None
         except Exception as err:  # noqa: BLE001
             _LOGGER.error("Error setting temperature to %s: %s", temperature, err)
-            self._temp_pending = None
