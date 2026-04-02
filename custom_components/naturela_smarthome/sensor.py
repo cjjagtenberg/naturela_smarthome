@@ -201,6 +201,8 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
         if value is None:
             return None
         if value in (2, 8):
+            if d.get("Igniter"):
+                return "Ontsteking"
             fpower = d.get("FPower") or 0
             p3 = d.get("Power3")
             p2 = d.get("Power2")
