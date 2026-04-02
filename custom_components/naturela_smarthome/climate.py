@@ -76,6 +76,7 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         self._device_id = device_id
         self._command_pending = False  # True while waiting for stove to start
         self._command_pending_since: datetime.datetime | None = None
+        self._temp_pending: float | None = None  # Optimistic temperature while API catches up
         self._attr_unique_id = f"{DOMAIN}_{device_id}_climate"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device_id))},
@@ -148,9 +149,16 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
             else:
                 self._attr_hvac_mode = HVACMode.OFF
 
-        # Always update temperatures
+        # Always update current temperature; protect target while pending
         self._attr_current_temperature = data.get("TempBoiler")
-        self._attr_target_temperature = data.get("SetTemp")
+        api_temp = data.get("SetTemp")
+        if self._temp_pending is not None:
+            if api_temp is not None and abs(api_temp - self._temp_pending) < 0.5:
+                self._temp_pending = None
+                self._attr_target_temperature = api_temp
+            # else: keep optimistic value
+        else:
+            self._attr_target_temperature = api_temp
 
         if self.hass is not None:
             self.async_write_ha_state()
@@ -215,11 +223,17 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         temperature = kwargs.get("temperature")
         if temperature is None:
             return
+        # Optimistic update — show new temp immediately so +/- buttons don't flicker
+        self._temp_pending = temperature
+        self._attr_target_temperature = temperature
+        self.async_write_ha_state()
         try:
             success = await self._api.set_temperature(temperature)
             if success:
                 await self.coordinator.async_request_refresh()
             else:
                 _LOGGER.error("Failed to set temperature to %s", temperature)
+                self._temp_pending = None
         except Exception as err:  # noqa: BLE001
             _LOGGER.error("Error setting temperature to %s: %s", temperature, err)
+            self._temp_pending = None
