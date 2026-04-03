@@ -37,6 +37,9 @@ STATUS_NAMES = {
     "keeping": "Op temperatuur",
     "see display": "Zie display",
     "Burning": "Brandt",
-    "Power3": "Power 3",
+    "Power1": "Minimaal",
+    "Power2": "Power 1",
+    "Power3": "Power 2",
+    "Power4": "Power 3",
     "Ignition Fail": "Ontstekingsfout",
 }
