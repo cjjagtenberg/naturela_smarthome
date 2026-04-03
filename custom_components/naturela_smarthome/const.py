@@ -1,4 +1,4 @@
-"""Constants for the Naturela Smarthome integration."""
+h"""Constants for the Naturela Smarthome integration."""
 
 DOMAIN = "naturela_smarthome"
 MANUFACTURER = "Naturela"
@@ -24,7 +24,7 @@ STATE_ON = 128
 STATUS_NAMES = {
     0: "Stand-by",
     1: "Ontsteking",
-    2: "Werkt",
+    2: "Ontsteking",
     3: "Ontsteking",  # Igniter=True variant
     4: "Fout",
     5: "Wachten",
