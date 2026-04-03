@@ -200,6 +200,15 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
         value = d.get("Status")
         if value is None:
             return None
+        error_flag = d.get("ErrorFlag")
+        if error_flag:
+            try:
+                code = int(error_flag)
+                if code != 0:
+                    ERROR_CODES = {16: "Ontstekingsfout"}
+                    return ERROR_CODES.get(code, f"Fout {code}")
+            except (TypeError, ValueError):
+                pass
         if value in (2, 8):
             if d.get("Igniter"):
                 return "Ontsteking"
