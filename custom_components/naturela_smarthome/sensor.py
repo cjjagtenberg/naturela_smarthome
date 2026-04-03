@@ -210,18 +210,18 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
             except (TypeError, ValueError):
                 pass
         if value in (2, 8):
-            if d.get("Igniter"):
+            if d.get("Igniter") and value != 8:
                 return "Ontsteking"
             fpower = d.get("FPower") or 0
             p3 = d.get("Power3")
             p2 = d.get("Power2")
             p1 = d.get("Power1")
             if p3 is not None and fpower >= p3:
-                return "Power3"
+                return "Power 3"
             if p2 is not None and fpower >= p2:
-                return "Power2"
+                return "Power 2"
             if p1 is not None and fpower >= p1:
-                return "Power1"
+                return "Power 1"
         return STATUS_NAMES.get(value, str(value))
 
 
