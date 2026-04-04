@@ -1,4 +1,4 @@
-h"""Constants for the Naturela Smarthome integration."""
+"""Constants for the Naturela Smarthome integration."""
 
 DOMAIN = "naturela_smarthome"
 MANUFACTURER = "Naturela"
