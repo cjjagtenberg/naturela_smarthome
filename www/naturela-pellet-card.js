@@ -107,7 +107,14 @@ class NaturelaPelletCard extends HTMLElement {
     const targetT   = this._pendingTemp !== undefined ? this._pendingTemp : (climate?.attributes?.temperature ?? '—');
     const boilerT   = boilerS ? parseFloat(boilerS.state).toFixed(1) : '—';
     const flueT     = flueS ? Math.round(parseFloat(flueS.state)) : '—';
-    const powerVal  = powerS?.state ?? '-';
+    // Derive power label from status when no power_sensor configured
+    const powerFromStatus = (() => {
+      const pm = statusRaw.match(/^[Pp]ower\s*(\d+)$/);
+      if (pm) return 'P' + pm[1];
+      if ((statusRaw || '').toLowerCase() === 'minimaal') return 'Min';
+      return null;
+    })();
+    const powerVal  = powerFromStatus ?? (powerS?.state ?? '-');
     const pumpOn    = pumpS ? pumpS.state === 'on' : (climate?.attributes?.ch_pump === true);
     const pumpLabel = pumpOn ? 'Actief' : 'Inactief';
 
