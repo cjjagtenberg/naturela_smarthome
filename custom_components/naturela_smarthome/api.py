@@ -152,7 +152,7 @@ class NaturelaAPI:
             await self.login()
         session = await self._get_session()
 
-        async def _do_post():
+        def _do_post():
             return session.post(
                 url,
                 json=payload,
