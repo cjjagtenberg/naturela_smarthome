@@ -1,190 +1,191 @@
-# Naturela Smarthome – Home Assistant Integratie
+# Naturela Smarthome – Home Assistant Integration
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![HA Version](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-blue.svg)](https://www.home-assistant.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Stuur je **Naturela BurnerTouch pelletkachel** aan vanuit Home Assistant — via de bestaande cloud-API van [iot.naturela-bg.com](https://iot.naturela-bg.com). Geen lokale modificaties nodig.
+Control your **Naturela BurnerTouch pellet stove** from Home Assistant — via the existing cloud API at [iot.naturela-bg.com](https://iot.naturela-bg.com). No local modifications required.
 
 ---
 
-## Ondersteunde apparaten
+## Supported devices
 
-| Apparaat | Controller | Firmware |
+| Device | Controller | Firmware |
 |---|---|---|
-| Naturela pelletbrander | BurnerTouch (NPBC_V6T_2) | ≥ 65 |
+| Naturela pellet burner | BurnerTouch (NPBC_V6T_2) | ≥ 65 |
 
 ---
 
-## Functies
+## Features
 
-### Climate entiteit
-- Kachel **aan/uit** zetten
-- **Doeltemperatuur** instellen (30–85 °C)
-- Dynamische **kleurfeedback** in het dashboard:
-  - 🟡 Amber = Ontsteking bezig (status 1)
-  - 🟠 Diep-oranje = Kachel brandt (status 2 / 8)
-  - Grijs = Stand-by / Uit
+### Climate entity
+- Turn the stove **on/off**
+- Set the **target temperature** (30–85 °C)
+- Dynamic **colour feedback** in the dashboard:
+  - 🟡 Amber = Ignition in progress (status 1)
+  - 🟠 Deep orange = Stove burning (status 2 / 8)
+  - Grey = Stand-by / Off
 
-### Sensoren
+### Sensors
 
-| Entiteit | Type | Eenheid | Omschrijving |
+| Entity | Type | Unit | Description |
 |---|---|---|---|
-| Keteltemperatuur | `sensor` | °C | Huidig ketelwater |
-| Doeltemperatuur | `sensor` | °C | Ingestelde setpoint |
-| Rookgastemperatuur | `sensor` | °C | Schoorsteen/flue |
-| Warmwatertemperatuur | `sensor` | °C | Boiler DHW |
-| Brandertrap | `sensor` | — | Branderstand (1–5, geheel getal) |
-| Thermisch vermogen | `sensor` | kW | Werkelijk thermisch uitvermogen |
-| Vlamniveau | `sensor` | 0–5 | Brandintensiteit |
-| Pelletverbruik | `sensor` | kg | Totaal verbruik |
-| Statuscode | `sensor` | — | Numerieke statuscode |
+| Boiler temperature | `sensor` | °C | Current boiler water temperature |
+| Target temperature | `sensor` | °C | Configured setpoint |
+| Flue gas temperature | `sensor` | °C | Chimney / flue |
+| DHW temperature | `sensor` | °C | Domestic hot water boiler |
+| Burner step | `sensor` | — | Burner level (1–5, integer) |
+| Thermal output | `sensor` | kW | Actual thermal output power |
+| Flame level | `sensor` | 0–5 | Combustion intensity |
+| Pellet consumption | `sensor` | kg | Total consumption |
+| Status | `sensor` | — | Human-readable status label |
 
-### Binary sensoren
+### Binary sensors
 
-| Entiteit | Omschrijving |
+| Entity | Description |
 |---|---|
-| CV-pomp | Aan/uit |
-| Warmwaterpomp | Aan/uit |
-| Ontsteking actief | Aan/uit |
-| Reiniger actief | Aan/uit |
-| Thermostaat | Invoer actief |
-| Externe stop | Invoer actief |
+| Central heating pump | On/off |
+| DHW pump | On/off |
+| Igniter active | On/off |
+| Cleaner active | On/off |
+| Thermostat | Input active |
+| External stop | Input active |
 
-### Statuscodes
+### Status codes
 
-| Code | Naam | Betekenis |
+| Code | Name | Meaning |
 |---|---|---|
-| 0 | Stand-by | Kachel inactief |
-| 1 | Ontsteking | Opstartfase – pellets ontbranden |
-| 2 | Werkt | Normale werking |
-| 3   | Ontsteking     | Opstartfase fase 2 (Igniter=True)                    |
-| 4 | Fout | Storing |
-| 5 | Wachten | Wacht op startsignaal |
-| 6 | Reinigen | Automatisch reinigingsprogramma |
-| 8 | Werkt | Normale werking (alternatieve code) |
-| 7   | Afkoelen       | Afkoelfase na afsluiting (FPower nog actief)         |
-| 10  | Op temperatuur | Eindfase afkoeling (FPower=0)                        |
+| 0 | Stand-by | Stove inactive |
+| 1 | Cleaning | Start phase – pellets igniting |
+| 2 | Burning | Normal operation |
+| 3 | Unfolding fire | Flame build-up after ignition (flue gas +5 °C trigger) |
+| 4 | Fault | Error / alarm |
+| 5 | Suspend | Waiting for start signal |
+| 6 | Suspend | Entering suspend (P1 modulation just before) |
+| 7 | Burning shutdown | Ramp-down phase (P3→P2→P1, 60 s each) |
+| 8 | Burning | Normal operation (alternative code) |
+| 10 | Cool down | Final cool-down phase (FPower=0) |
 
 ---
 
-## Installatie
+## Installation
 
-### Via HACS (aanbevolen)
+### Via HACS (recommended)
 
-1. Ga in Home Assistant naar **HACS → Integraties**
-2. Klik op de drie puntjes rechtsboven → **Aangepaste repositories**
-3. Voeg toe: `https://github.com/cjjagtenberg/naturela_smarthome` als type **Integration**
-4. Zoek op **Naturela Smarthome** en installeer
-5. **Herstart Home Assistant**
-6. Ga naar **Instellingen → Apparaten & diensten → Integratie toevoegen** → zoek **Naturela Smarthome**
+1. In Home Assistant go to **HACS → Integrations**
+2. Click the three dots in the top right → **Custom repositories**
+3. Add: `https://github.com/cjjagtenberg/naturela_smarthome` as type **Integration**
+4. Search for **Naturela Smarthome** and install
+5. **Restart Home Assistant**
+6. Go to **Settings → Devices & services → Add integration** → search **Naturela Smarthome**
 
-### Handmatig
+### Manual
 
-1. Download de map `custom_components/naturela_smarthome` uit deze repository
-2. Kopieer naar je HA-configuratiemap:
-
-```
-<config>/custom_components/naturela_smarthome/
-```
-
-3. **Herstart Home Assistant**
-4. Ga naar **Instellingen → Apparaten & diensten → Integratie toevoegen** → zoek **Naturela Smarthome**
+1. Download the `custom_components/naturela_smarthome` folder from this repository
+2. Copy it to your HA configuration directory:
+   ```
+   <config>/custom_components/naturela_smarthome/
+   ```
+3. **Restart Home Assistant**
+4. Go to **Settings → Devices & services → Add integration** → search **Naturela Smarthome**
 
 ---
 
-## Configuratie
+## Configuration
 
-Bij het instellen vul je in:
+During setup you will be asked for:
 
-| Veld | Voorbeeld | Omschrijving |
+| Field | Example | Description |
 |---|---|---|
-| E-mailadres | `naam@mail.nl` | Inloggegevens van iot.naturela-bg.com |
-| Wachtwoord | `••••••••` | Wachtwoord van iot.naturela-bg.com |
-| Apparaat-ID | `6548` | Zichtbaar in de URL: `/#/device/burnertouch/6548` |
-| Poll-interval | `30` | Verversing in seconden (standaard 30) |
+| Email address | `name@mail.com` | Login credentials for iot.naturela-bg.com |
+| Password | `••••••••` | Password for iot.naturela-bg.com |
+| Device ID | `6548` | Visible in the URL: `/#/device/burnertouch/6548` |
+| Poll interval | `30` | Refresh interval in seconds (default 30) |
 
 ---
 
-## Dashboard kaart
+## Dashboard card
 
-Er is een speciale Lovelace custom card beschikbaar: [`naturela-pellet-card.js`](naturela-pellet-card.js).
+A custom Lovelace card is available: [`naturela-pellet-card.js`](www/naturela-pellet-card.js).
 
-**Installatie:**
-1. Kopieer `naturela-pellet-card.js` naar `/config/www/` in Home Assistant
-2. Voeg toe als resource: `Instellingen → Dashboard → Resources → + Toevoegen`
+**Installation:**
+
+1. Copy `naturela-pellet-card.js` to `/config/www/` in Home Assistant
+2. Add as a resource: `Settings → Dashboards → Resources → + Add`
    - URL: `/local/naturela-pellet-card.js`
    - Type: JavaScript module
-3. Voeg de kaart toe aan je Lovelace dashboard:
+3. Add the card to your Lovelace dashboard:
 
 ```yaml
 type: custom:naturela-pellet-card
-climate_entity: climate.schuurkachel
-temp_sensor: sensor.schuurkachel_keteltemperatuur
-flue_sensor: sensor.schuurkachel_rookgastemperatuur
-power_sensor: sensor.schuurkachel_thermisch_vermogen
-ch_pump_sensor: binary_sensor.schuurkachel_cv_pomp
-dhw_pump_sensor: binary_sensor.schuurkachel_warmwaterpomp
-status_sensor: sensor.schuurkachel_status
+climate_entity: climate.pellet_stove
+boiler_sensor: sensor.pellet_stove_boiler_temperature
+flue_sensor: sensor.pellet_stove_flue_gas_temperature
+power_sensor: sensor.pellet_stove_thermal_output
+status_sensor: sensor.pellet_stove_status
+alarm_sensor: sensor.pellet_stove_alarm
 ```
 
-**Voorbeeld weergave:**
-
+**Example view:**
 ```
 ┌─────────────────────────────────────────┐
-│  🔥  Pellet CV-kachel      Stand-by     │
-│      Ketelwater: 42 °C  Instelling 60°C │
-│  [ Aan ]  [████ UIT ████]               │
-├──────────────┬──────────────┬─────────┤
-│ SCHOORSTEEN  │   VERMOGEN   │   POMP    │
-│    31 °C     │   17.9 kW    │  Actief   │
-├──────────────┴──────────────┴─────────┤
-│            STATUS: Stand-by             │
+│ 🔥 Pellet Stove          Stand-by       │
+│ Boiler: 42 °C            Target 60°C   │
+│         [ On  ]  [████  OFF  ████]      │
+├──────────────┬──────────────┬──────────┤
+│    FLUE      │    POWER     │   PUMP   │
+│   31 °C      │   17.9 kW   │  Active  │
+├──────────────┴──────────────┴──────────┤
+│ STATUS: Stand-by                        │
 └─────────────────────────────────────────┘
 ```
 
 ---
 
-## Hoe werkt het?
+## How it works
 
-De integratie logt in op `iot.naturela-bg.com` via het normale webformulier (met CSRF-tokenextractie). Daarna wordt elke X seconden de API gepolld:
+The integration logs in to `iot.naturela-bg.com` via the standard web form (with CSRF token extraction). Every X seconds the API is polled:
 
-- **GET** `https://iot.naturela-bg.com/api/burnertouch/{device_id}` — haalt alle sensordata op
-- **POST** `https://iot.naturela-bg.com/api/burnertouch/setState` — stuurt aan/uit-commando's en temperatuurwijzigingen
+- **GET** `https://iot.naturela-bg.com/api/burnertouch/{device_id}` — fetches all sensor data
+- **POST** `https://iot.naturela-bg.com/api/burnertouch/setState` — sends on/off commands and temperature changes
 
-De integratie detecteert opstart via de `_command_pending` vlag: zolang de kachel nog niet in een actieve status staat na een aan-commando, wordt de UI optimistisch op "Verwarmen" gehouden zodat de gebruiker geen fout ziet.
+The integration detects start-up via the `_command_pending` flag: as long as the stove has not entered an active status after an on-command, the UI is optimistically held at "Heating" so the user does not see a false off state.
 
 ---
 
 ## Changelog
 
 ### v11 (2026-04-01)
-- Card: statische headerkleur (niet langer afhankelijk van status-kleur)
-- Card: STATUS_COLORS aangevuld met statussen 3, 7 en 10
+- Card: static header colour (no longer dependent on status colour)
+- Card: STATUS_COLORS extended with statuses 3, 7 and 10
 
 ### v11 (2026-03-28)
-- Card: pomptegel en thermisch vermogen samengevoegd
-- Card: power_sensor hernoemd naar thermisch_vermogen
+- Card: pump tile and thermal output merged
+- Card: power_sensor renamed to thermal_output
 
-### v10 en eerder
-- Python integratie: binary sensoren toegevoegd
-- Python integratie: Firing/keeping string statussen toegevoegd aan ACTIVE_STATUSES
-- Python integratie: brandertrap-power berekening via FPower-drempels
-
-## Bekende beperkingen
-
-- Vereist een actieve internetverbinding (cloud-gebaseerd)
-- Timer-modus (`State = 2`) is niet instelbaar via HA
-- De exacte betekenis van sommige statusvelden is gebaseerd op reverse engineering; feedback welkom
+### v10 and earlier
+- Python integration: binary sensors added
+- Python integration: Firing/keeping string statuses added to ACTIVE_STATUSES
+- Python integration: burner step / power calculation via FPower thresholds
 
 ---
 
-## Bijdragen
+## Known limitations
 
-Pull requests en issues zijn welkom op [github.com/cjjagtenberg/naturela_smarthome](https://github.com/cjjagtenberg/naturela_smarthome). Heb jij een BurnerTouch-kachel met andere statuscodes of gedrag? Open een issue!
+- Requires an active internet connection (cloud-based)
+- Timer mode (`State = 2`) cannot be configured via HA
+- The exact meaning of some status fields is based on reverse engineering; feedback welcome
 
 ---
 
-## Licentie
+## Contributing
 
-MIT — zie [LICENSE](LICENSE)
+Pull requests and issues are welcome at [github.com/cjjagtenberg/naturela_smarthome](https://github.com/cjjagtenberg/naturela_smarthome).
+
+Do you have a BurnerTouch stove with different status codes or behaviour? Open an issue!
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE)
