@@ -168,7 +168,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
         icon="mdi:speedometer",
     ),
     NaturelaSensorEntityDescription(
-        key="alarm",
+        key="storing",
         api_key="ErrorFlag",
         name="Alarm",
         native_unit_of_measurement=None,
