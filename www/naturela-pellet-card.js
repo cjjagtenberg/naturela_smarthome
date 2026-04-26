@@ -1,4 +1,4 @@
-const STATUS_COLORS = {
+hconst STATUS_COLORS = {
   0:   { bg: '#546E7A', text: '#fff', name: 'Stand-by' },
   1:   { bg: '#FFA000', text: '#fff', name: 'Cleaning' },
   2:   { bg: '#E64A19', text: '#fff', name: 'Burning' },
@@ -87,7 +87,7 @@ class NaturelaPelletCard extends HTMLElement {
     this._render(); // update display immediately, don't wait for HA push
   }
 
-  _render() {
+  _alarmVal !== 'Normal'\n      && alarmVal !== 'geen';render() {
     if (!this._config || !this._hass || !this.shadowRoot) return;
 
     const cfg      = this._config;
