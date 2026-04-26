@@ -1,14 +1,14 @@
 {
-  "domain": "naturela_smarthome",
-  "name": "Naturela Smarthome",
-  "codeowners": [
-    "@cjjagtenberg"
-  ],
-  "config_flow": true,
-  "dependencies": [],
-  "documentation": "https://github.com/cjjagtenberg/naturela_smarthome",
-  "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/cjjagtenberg/naturela_smarthome/issues",
-  "requirements": [],
-  "version": "1.1.0"
+    "domain": "naturela_smarthome",
+    "name": "Naturela Smarthome",
+    "codeowners": [
+          "@cjjagtenberg"
+    ],
+    "config_flow": true,
+    "dependencies": [],
+    "documentation": "https://github.com/cjjagtenberg/naturela_smarthome",
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/cjjagtenberg/naturela_smarthome/issues",
+    "requirements": [],
+    "version": "1.2.0"
 }
