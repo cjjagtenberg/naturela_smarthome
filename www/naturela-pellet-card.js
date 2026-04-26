@@ -1,4 +1,4 @@
-hconst STATUS_COLORS = {
+const STATUS_COLORS = {
   0:   { bg: '#546E7A', text: '#fff', name: 'Stand-by' },
   1:   { bg: '#FFA000', text: '#fff', name: 'Cleaning' },
   2:   { bg: '#E64A19', text: '#fff', name: 'Burning' },
@@ -87,7 +87,7 @@ class NaturelaPelletCard extends HTMLElement {
     this._render(); // update display immediately, don't wait for HA push
   }
 
-  _alarmVal !== 'Normal'\n      && alarmVal !== 'geen';render() {
+  _render() {
     if (!this._config || !this._hass || !this.shadowRoot) return;
 
     const cfg      = this._config;
@@ -110,7 +110,8 @@ class NaturelaPelletCard extends HTMLElement {
       && alarmVal !== 'OK'
       && alarmVal !== 'ok'
       && alarmVal !== 'normal'
-      && alarmVal !== 'Normal';
+      && alarmVal !== 'Normal'
+      && alarmVal !== 'geen';
 
     const isOn    = climate?.state === 'heat';
     const targetT = this._pendingTemp !== undefined
