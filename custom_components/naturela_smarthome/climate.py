@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import math
 
 from homeassistant.components.climate import (
     ClimateEntity,
@@ -17,6 +18,18 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import CONF_DEVICE_ID, DOMAIN, MANUFACTURER, MODEL, STATE_OFF, STATE_ON, STATUS_NAMES
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _safe_temp(value):
+    """Convert API temperature value to float, returning None for NaN/Inf/None."""
+    if value is None:
+        return None
+    try:
+        f = float(value)
+        return f if math.isfinite(f) else None
+    except (TypeError, ValueError):
+        return None
+
 
 HVAC_MODES = [HVACMode.OFF, HVACMode.HEAT]
 
@@ -99,8 +112,8 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         else:
             self._attr_hvac_mode = HVACMode.OFF
 
-        self._attr_current_temperature = data.get("TempBoiler")
-        self._attr_target_temperature = data.get("SetTemp")
+        self._attr_current_temperature = _safe_temp(data.get("TempBoiler"))
+        self._attr_target_temperature = _safe_temp(data.get("SetTemp"))
 
     def _handle_coordinator_update(self) -> None:
         """Called by the coordinator after every poll.
@@ -132,8 +145,8 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
                 self._attr_hvac_mode = HVACMode.OFF
 
         # Always update temperatures
-        self._attr_current_temperature = data.get("TempBoiler")
-        self._attr_target_temperature = data.get("SetTemp")
+        self._attr_current_temperature = _safe_temp(data.get("TempBoiler"))
+        self._attr_target_temperature = _safe_temp(data.get("SetTemp"))
 
         if self.hass is not None:
             self.async_write_ha_state()
