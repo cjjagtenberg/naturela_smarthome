@@ -1,6 +1,7 @@
 """Sensor entities for Naturela BurnerTouch pellet stove."""
 from __future__ import annotations
 
+import logging
 import math
 from dataclasses import dataclass
 
@@ -16,7 +17,21 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import CONF_DEVICE_ID, DOMAIN, MANUFACTURER, MODEL, STATUS_NAMES
+from .const import (
+    BURNING_STATUS_CODES,
+    CONF_DEVICE_ID,
+    DOMAIN,
+    MANUFACTURER,
+    MODEL,
+    STATUS_NAMES,
+    STATUS_OPTIONS,
+)
+
+_LOGGER = logging.getLogger(__name__)
+
+# Track Status values we've already warned about so we don't spam the log
+# every poll cycle (default 30s) with the same unknown code.
+_LOGGED_UNKNOWN_STATUS: set = set()
 
 
 @dataclass
@@ -155,6 +170,9 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
 )
 
 
+# Sensors whose values must always be finite numbers.  Used to guard against
+# the Naturela API returning "NaN", null, or out-of-range values on fields that
+# the stove doesn't actually measure (e.g. no DHW boiler connected).
 _NUMERIC_KEYS = {
     "temp_boiler",
     "temp_dhw",
@@ -178,7 +196,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Naturela sensor entities."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    coordinator = entry.runtime_data.coordinator
     device_id = entry.data.get(CONF_DEVICE_ID, 6548)
 
     entities: list[SensorEntity] = [
@@ -206,10 +224,24 @@ class _NaturelaEntityBase(CoordinatorEntity):
 
 
 class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
-    """Human-readable status of the stove (Stand-by / Power1 / Power2 / Power3 ...)."""
+    """Human-readable status of the stove.
+
+    Returns one of the labels in STATUS_OPTIONS (ENUM device class) so HA's
+    history graph and logbook render nicely with colored bars per state.
+
+    Mapping logic:
+      - When status code is in BURNING_STATUS_CODES (2 or 8), derive power
+        label from FPower vs Power1/Power2/Power3 thresholds reported by
+        the API → returns "Power1" / "Power2" / "Power3" / "PS".
+      - Otherwise look up STATUS_NAMES (numeric or string key).
+      - Unknown codes return "Unknown" rather than raising or polluting
+        history with arbitrary values.
+    """
 
     _attr_icon = "mdi:fire-alert"
     _attr_has_entity_name = True
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = STATUS_OPTIONS
 
     def __init__(self, coordinator, device_id: int) -> None:
         super().__init__(coordinator, device_id)
@@ -224,7 +256,9 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
         value = d.get("Status")
         if value is None:
             return None
-        if value in (2, 8):
+        # Burning state → derive power-level label from FPower vs thresholds.
+        # Matches what the Naturela controller and web portal display.
+        if value in BURNING_STATUS_CODES:
             fpower = d.get("FPower") or 0
             p3 = d.get("Power3")
             p2 = d.get("Power2")
@@ -235,19 +269,56 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
                 return "Power2"
             if p1 is not None and fpower >= p1:
                 return "Power1"
-        return STATUS_NAMES.get(value, str(value))
+            # FPower below P1 threshold but burning → PS (Keeping)
+            if fpower > 0:
+                return "PS"
+            # FPower=0 yet status burning → transitional, fall through to STATUS_NAMES
+        label = STATUS_NAMES.get(value)
+        if label is None:
+            # Unknown status — log once per unique value so we can extend
+            # STATUS_NAMES later. Critical for catching error states like
+            # "No pellets" or "Overheating" with their actual API spelling.
+            key = (type(value).__name__, value)
+            if key not in _LOGGED_UNKNOWN_STATUS:
+                _LOGGED_UNKNOWN_STATUS.add(key)
+                _LOGGER.warning(
+                    "Naturela: unknown Status value %r (type=%s) — falling back to 'Unknown'. "
+                    "Please report so it can be added to STATUS_NAMES.",
+                    value, type(value).__name__,
+                )
+            return "Unknown"
+        # Final safety: only return labels that are in the ENUM options list.
+        if label not in STATUS_OPTIONS:
+            key = ("label", label)
+            if key not in _LOGGED_UNKNOWN_STATUS:
+                _LOGGED_UNKNOWN_STATUS.add(key)
+                _LOGGER.warning(
+                    "Naturela: status label %r maps from %r but is not in STATUS_OPTIONS",
+                    label, value,
+                )
+            return "Unknown"
+        return label
 
 
 def _coerce_numeric(value):
-    """Convert an API value to a finite float, or return None."""
+    """Convert an API value to a finite float, or return None.
+
+    Guards against:
+    - None
+    - float('nan') / float('inf')
+    - string "NaN", "null", "", etc.
+    - any value that can't be converted to a finite float
+    """
     if value is None:
         return None
+    # Catch actual float NaN/Inf first (isinstance check before str conversion)
     if isinstance(value, float):
         if not math.isfinite(value):
             return None
         return value
     if isinstance(value, (int, bool)):
         return float(value)
+    # String or other — try to convert, treat "NaN"/"Infinity"/"" as missing
     try:
         s = str(value).strip()
         if not s or s.lower() in ("nan", "null", "none", "inf", "-inf", "infinity", "-infinity"):
@@ -281,6 +352,8 @@ class NaturelaSensor(_NaturelaEntityBase, SensorEntity):
             return None
         value = self.coordinator.data.get(self.entity_description.api_key)
         if value is None:
+            # For sensors where "no data" means 0 (power, fan speed, etc.),
+            # return 0 instead of None so the sensor shows 0 instead of "-".
             if self.entity_description.null_as_zero:
                 value = 0
             else:
@@ -288,16 +361,22 @@ class NaturelaSensor(_NaturelaEntityBase, SensorEntity):
 
         multiplier = self.entity_description.value_multiplier
 
+        # All sensors defined here are numeric — coerce to a finite float or None.
+        # Home Assistant validates finite values for TEMPERATURE / POWER device
+        # classes and will raise errors on NaN / Inf, which shows up as "NaN"
+        # on the dashboard.
         if self.entity_description.key in _NUMERIC_KEYS:
             num = _coerce_numeric(value)
             if num is None:
                 return None
             if multiplier != 1.0:
                 return round(num * multiplier, 2)
+            # Preserve integer type for fields that are always whole numbers
             if isinstance(value, int) and not isinstance(value, bool):
                 return int(num)
             return num
 
+        # Fallback for any future non-numeric sensors
         if multiplier != 1.0:
             try:
                 return round(float(value) * multiplier, 2)
