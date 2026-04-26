@@ -194,6 +194,13 @@ class NaturelaAPI:
             return False
 
 
+    async def close(self) -> None:
+        """Close the underlying aiohttp session."""
+        if self._session and not self._session.closed:
+            await self._session.close()
+        self._session = None
+
+
 def _extract_csrf_token(html: str) -> str:
     """Extract the ASP.NET CSRF token from the login page HTML."""
     marker = 'name="__RequestVerificationToken"'
