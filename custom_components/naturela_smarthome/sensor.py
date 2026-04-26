@@ -178,7 +178,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Naturela sensor entities."""
-    coordinator = entry.runtime_data.coordinator
+    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     device_id = entry.data.get(CONF_DEVICE_ID, 6548)
 
     entities: list[SensorEntity] = [
