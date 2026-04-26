@@ -25,6 +25,7 @@ class NaturelaSensorEntityDescription(SensorEntityDescription):
 
     api_key: str = ""
     value_multiplier: float = 1.0
+    null_as_zero: bool = False  # Treat None/null API value as 0 (e.g. power when stove is off)
 
 
 SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
@@ -72,6 +73,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:fire",
+        null_as_zero=True,
     ),
     NaturelaSensorEntityDescription(
         key="fire_level",
@@ -81,6 +83,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:fire-circle",
+        null_as_zero=True,
     ),
     NaturelaSensorEntityDescription(
         key="fuel_consumed",
@@ -100,6 +103,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:gauge",
         value_multiplier=0.1,
+        null_as_zero=True,
     ),
     NaturelaSensorEntityDescription(
         key="main_fan",
@@ -109,6 +113,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:fan",
+        null_as_zero=True,
     ),
     NaturelaSensorEntityDescription(
         key="exhaust_fan",
@@ -118,6 +123,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:fan-chevron-down",
+        null_as_zero=True,
     ),
     NaturelaSensorEntityDescription(
         key="power1_threshold",
@@ -149,9 +155,6 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
 )
 
 
-# Sensors whose values must always be finite numbers.  Used to guard against
-# the Naturela API returning "NaN", null, or out-of-range values on fields that
-# the stove doesn't actually measure (e.g. no DHW boiler connected).
 _NUMERIC_KEYS = {
     "temp_boiler",
     "temp_dhw",
@@ -169,51 +172,20 @@ _NUMERIC_KEYS = {
 }
 
 
-def _coerce_numeric(value):
-    """Convert an API value to a finite float, or return None.
-
-    Guards against:
-    - None
-    - float('nan') / float('inf')
-    - string "NaN", "null", "", etc.
-    - any value that can't be converted to a finite float
-    """
-    if value is None:
-        return None
-    # Catch actual float NaN/Inf first (isinstance check before str conversion)
-    if isinstance(value, float):
-        if not math.isfinite(value):
-            return None
-        return value
-    if isinstance(value, (int, bool)):
-        return float(value)
-    # String or other -- try to convert, treat "NaN"/"Infinity"/"" as missing
-    try:
-        s = str(value).strip()
-        if not s or s.lower() in ("nan", "null", "none", "inf", "-inf", "infinity", "-infinity"):
-            return None
-        num = float(s)
-        if not math.isfinite(num):
-            return None
-        return num
-    except (TypeError, ValueError):
-        return None
-
-
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Naturela sensor entities."""
-    data = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data.coordinator
     device_id = entry.data.get(CONF_DEVICE_ID, 6548)
 
     entities: list[SensorEntity] = [
-        NaturelaStatusSensor(data["coordinator"], device_id),
+        NaturelaStatusSensor(coordinator, device_id),
     ]
     entities += [
-        NaturelaSensor(data["coordinator"], device_id, desc)
+        NaturelaSensor(coordinator, device_id, desc)
         for desc in SENSORS
     ]
     async_add_entities(entities)
@@ -234,7 +206,7 @@ class _NaturelaEntityBase(CoordinatorEntity):
 
 
 class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
-    """Human-readable status (Stand-by / Power1 / Power2 / Power3 ...)."""
+    """Human-readable status of the stove (Stand-by / Power1 / Power2 / Power3 ...)."""
 
     _attr_icon = "mdi:fire-alert"
     _attr_has_entity_name = True
@@ -252,29 +224,40 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
         value = d.get("Status")
         if value is None:
             return None
-        error_flag = d.get("ErrorFlag")
-        if error_flag:
-            try:
-                code = int(error_flag)
-                if code != 0:
-                    ERROR_CODES = {16: "Ontstekingsfout"}
-                    return ERROR_CODES.get(code, f"Fout {code}")
-            except (TypeError, ValueError):
-                pass
         if value in (2, 8):
-            if d.get("Igniter") and value != 8:
-                return "Ontsteking"
             fpower = d.get("FPower") or 0
             p3 = d.get("Power3")
             p2 = d.get("Power2")
             p1 = d.get("Power1")
             if p3 is not None and fpower >= p3:
-                return "Power 3"
+                return "Power3"
             if p2 is not None and fpower >= p2:
-                return "Power 2"
+                return "Power2"
             if p1 is not None and fpower >= p1:
-                return "Power 1"
+                return "Power1"
         return STATUS_NAMES.get(value, str(value))
+
+
+def _coerce_numeric(value):
+    """Convert an API value to a finite float, or return None."""
+    if value is None:
+        return None
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return None
+        return value
+    if isinstance(value, (int, bool)):
+        return float(value)
+    try:
+        s = str(value).strip()
+        if not s or s.lower() in ("nan", "null", "none", "inf", "-inf", "infinity", "-infinity"):
+            return None
+        num = float(s)
+        if not math.isfinite(num):
+            return None
+        return num
+    except (TypeError, ValueError):
+        return None
 
 
 class NaturelaSensor(_NaturelaEntityBase, SensorEntity):
@@ -298,24 +281,23 @@ class NaturelaSensor(_NaturelaEntityBase, SensorEntity):
             return None
         value = self.coordinator.data.get(self.entity_description.api_key)
         if value is None:
-            return None
+            if self.entity_description.null_as_zero:
+                value = 0
+            else:
+                return None
 
         multiplier = self.entity_description.value_multiplier
 
-        # Numeric sensors must produce a finite float -- HA validates this for
-        # TEMPERATURE / POWER device classes and would otherwise show "unknown".
         if self.entity_description.key in _NUMERIC_KEYS:
             num = _coerce_numeric(value)
             if num is None:
                 return None
             if multiplier != 1.0:
                 return round(num * multiplier, 2)
-            # Preserve integer type for fields that are always whole numbers
             if isinstance(value, int) and not isinstance(value, bool):
                 return int(num)
             return num
 
-        # Fallback for any future non-numeric sensors
         if multiplier != 1.0:
             try:
                 return round(float(value) * multiplier, 2)
