@@ -27,42 +27,42 @@ BINARY_SENSORS: tuple[NaturelaBinarySensorEntityDescription, ...] = (
     NaturelaBinarySensorEntityDescription(
         key="ch_pump",
         api_key="CHPump",
-        name="CV-pomp",
+        name="Central heating pump",
         device_class=BinarySensorDeviceClass.RUNNING,
         icon="mdi:pump",
     ),
     NaturelaBinarySensorEntityDescription(
         key="dhw_pump",
         api_key="DHWPump",
-        name="Warmwaterpomp",
+        name="DHW pump",
         device_class=BinarySensorDeviceClass.RUNNING,
         icon="mdi:pump",
     ),
     NaturelaBinarySensorEntityDescription(
         key="igniter",
         api_key="Igniter",
-        name="Ontsteking actief",
+        name="Igniter active",
         device_class=BinarySensorDeviceClass.HEAT,
         icon="mdi:fire",
     ),
     NaturelaBinarySensorEntityDescription(
         key="cleaner",
         api_key="Cleaner",
-        name="Reiniger actief",
+        name="Cleaner active",
         device_class=None,
         icon="mdi:broom",
     ),
     NaturelaBinarySensorEntityDescription(
         key="thermostat",
         api_key="Thermostat",
-        name="Thermostaat",
+        name="Thermostat",
         device_class=BinarySensorDeviceClass.HEAT,
         icon="mdi:thermostat",
     ),
     NaturelaBinarySensorEntityDescription(
         key="external_stop",
         api_key="ExternalStop",
-        name="Externe stop",
+        name="External stop",
         device_class=BinarySensorDeviceClass.SAFETY,
         icon="mdi:stop-circle",
     ),
@@ -102,7 +102,7 @@ class NaturelaBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self._attr_unique_id = f"{DOMAIN}_{device_id}_{description.key}"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device_id))},
-            "name": "Schuurkachel",
+            "name": "Pellet Stove",
             "manufacturer": MANUFACTURER,
             "model": MODEL,
         }
