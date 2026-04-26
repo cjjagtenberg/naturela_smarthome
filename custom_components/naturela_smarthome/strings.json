@@ -2,23 +2,23 @@
   "config": {
     "step": {
       "user": {
-        "title": "Naturela Smarthome instellen",
-        "description": "Voer je inloggegevens in van {url}",
+        "title": "Set up Naturela Smarthome",
+        "description": "Enter your login credentials for {url}",
         "data": {
-          "username": "E-mailadres",
-          "password": "Wachtwoord",
-          "device_id": "Apparaat-ID (zie URL: /device/burnertouch/{id})",
-          "scan_interval": "Poll-interval (seconden, min. 10)"
+          "username": "Email address",
+          "password": "Password",
+          "device_id": "Device ID (see URL: /device/burnertouch/{id})",
+          "scan_interval": "Poll interval (seconds, min. 10)"
         }
       }
     },
     "error": {
-      "cannot_connect": "Kan geen verbinding maken met iot.naturela-bg.com",
-      "invalid_auth": "Ongeldige inloggegevens",
-      "unknown": "Onverwachte fout"
+      "cannot_connect": "Cannot connect to iot.naturela-bg.com",
+      "invalid_auth": "Invalid credentials",
+      "unknown": "Unexpected error"
     },
     "abort": {
-      "already_configured": "Dit apparaat is al geconfigureerd"
+      "already_configured": "This device is already configured"
     }
   }
 }
