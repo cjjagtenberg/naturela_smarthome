@@ -1,20 +1,19 @@
-# Naturela BurnerTouch - Voorbeeld dashboard kaart voor Home Assistant
+# Naturela BurnerTouch - Example dashboard card for Home Assistant
 #
-# VEREISTE: Installeer eerst de custom card (zie README.md stap 4).
+# REQUIREMENT: Install the custom card first (see README.md step 4).
 #
-# Stap 1 - Kopieer naturela-pellet-card.js naar /config/www/
-# Stap 2 - Voeg toe als Lovelace resource:
-#   Instellingen -> Dashboards -> ... -> Resources -> +
-#   URL: /local/naturela-pellet-card.js   Type: JavaScript module
-# Stap 3 - Herlaad de browser (Ctrl+F5 / Cmd+Shift+R)
-# Stap 4 - Plak onderstaande YAML in je dashboard via de ruwe YAML-editor
-
+# Step 1 - Copy naturela-pellet-card.js to /config/www/
+# Step 2 - Add as a Lovelace resource:
+#          Settings -> Dashboards -> ... -> Resources -> +
+#          URL: /local/naturela-pellet-card.js  Type: JavaScript module
+# Step 3 - Reload the browser (Ctrl+F5 / Cmd+Shift+R)
+# Step 4 - Paste the YAML below into your dashboard via the raw YAML editor
 type: custom:naturela-pellet-card
-title: Schuur (Pellets)
-climate_entity: climate.schuurkachel
-status_sensor:  sensor.schuurkachel_status
-boiler_sensor:  sensor.schuurkachel_keteltemperatuur
-flue_sensor:    sensor.schuurkachel_rookgastemperatuur
-power_sensor:   sensor.schuurkachel_thermisch_vermogen
-flame_sensor:   sensor.schuurkachel_vlamniveau
-alarm_sensor:   sensor.schuurkachel_storing
+title: Shed (Pellets)
+climate_entity: climate.pellet_stove
+status_sensor: sensor.pellet_stove_status
+boiler_sensor: sensor.pellet_stove_boiler_temperature
+flue_sensor: sensor.pellet_stove_flue_gas_temperature
+power_sensor: sensor.pellet_stove_thermal_output
+flame_sensor: sensor.pellet_stove_flame_level
+alarm_sensor: sensor.pellet_stove_alarm
