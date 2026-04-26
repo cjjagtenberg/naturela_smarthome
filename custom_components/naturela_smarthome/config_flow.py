@@ -25,7 +25,8 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 
 
 async def _validate_credentials(
-    hass: HomeAssistant, data: dict
+    hass: HomeAssistant,
+    data: dict,
 ) -> dict:
     """Validate credentials by attempting a login."""
     api = NaturelaAPI(
@@ -46,7 +47,8 @@ class NaturelaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(
-        self, user_input: dict | None = None
+        self,
+        user_input: dict | None = None,
     ):
         """Show the setup form and validate credentials."""
         errors: dict[str, str] = {}
@@ -66,7 +68,7 @@ class NaturelaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(f"naturela_{device_id}")
                 self._abort_if_unique_id_configured()
                 return self.async_create_entry(
-                    title=f"Naturela Schuurkachel ({device_id})",
+                    title=f"Naturela Pellet Stove ({device_id})",
                     data=user_input,
                 )
 
