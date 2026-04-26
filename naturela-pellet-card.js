@@ -140,6 +140,7 @@ class NaturelaPelletCard extends HTMLElement {
         .header-icon { font-size: 1.4em; line-height: 1; }
         .header-texts { flex: 1; }
         .header-title { font-size: 1.05em; font-weight: 600; line-height: 1.2; color: #fff; }
+        .header-sub { font-size: 0.8em; opacity: 0.85; margin-top: 1px; }
         .temps-row { display: flex; padding: 16px 16px 12px; gap: 8px; }
         .temp-block { flex: 1; }
         .temp-label {
@@ -203,6 +204,7 @@ class NaturelaPelletCard extends HTMLElement {
           <div class="header-icon">🔥</div>
           <div class="header-texts">
             <div class="header-title">${title}</div>
+            <div class="header-sub">${statusRaw}</div>
           </div>
         </div>
         ${heeftStoring ? `<div class="storing-banner"><div class="storing-banner-icon">⚠️</div><div class="storing-banner-text"><div class="storing-banner-label">Storing / Fout</div><div>${storingVal}</div></div></div>` : ''}
