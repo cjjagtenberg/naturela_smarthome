@@ -47,7 +47,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="temp_boiler",
         api_key="TempBoiler",
-        name="Keteltemperatuur",
+        name="Boiler temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -56,7 +56,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="temp_dhw",
         api_key="TempDHW",
-        name="Warmwatertemperatuur",
+        name="DHW temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -65,7 +65,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="temp_fume",
         api_key="TempFume",
-        name="Rookgastemperatuur",
+        name="Flue gas temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -74,7 +74,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="set_temp",
         api_key="SetTemp",
-        name="Doeltemperatuur",
+        name="Target temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -83,7 +83,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="power_kw",
         api_key="FPower",
-        name="Brandertrap",
+        name="Burner step",
         native_unit_of_measurement=None,
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -93,7 +93,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="fire_level",
         api_key="FireLevel",
-        name="Vlamniveau",
+        name="Flame level",
         native_unit_of_measurement=None,
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -103,7 +103,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="fuel_consumed",
         api_key="FuelConsum",
-        name="Pelletverbruik totaal",
+        name="Total pellet consumption",
         native_unit_of_measurement=UnitOfMass.KILOGRAMS,
         device_class=None,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -112,7 +112,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="output_power",
         api_key="OutputPower",
-        name="Thermisch vermogen",
+        name="Thermal output",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
@@ -123,7 +123,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="main_fan",
         api_key="MainFan",
-        name="Hoofdventilator",
+        name="Primary fan",
         native_unit_of_measurement="%",
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -133,7 +133,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="exhaust_fan",
         api_key="ExhaustFan",
-        name="Afzuigventilator",
+        name="Exhaust fan",
         native_unit_of_measurement="%",
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -143,7 +143,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="power1_threshold",
         api_key="Power1",
-        name="Vermogenstrap 1",
+        name="Power level 1",
         native_unit_of_measurement=None,
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -152,7 +152,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="power2_threshold",
         api_key="Power2",
-        name="Vermogenstrap 2",
+        name="Power level 2",
         native_unit_of_measurement=None,
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -161,7 +161,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     NaturelaSensorEntityDescription(
         key="power3_threshold",
         api_key="Power3",
-        name="Vermogenstrap 3",
+        name="Power level 3",
         native_unit_of_measurement=None,
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -169,8 +169,7 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
     ),
 )
 
-
-# Sensors whose values must always be finite numbers.  Used to guard against
+# Sensors whose values must always be finite numbers. Used to guard against
 # the Naturela API returning "NaN", null, or out-of-range values on fields that
 # the stove doesn't actually measure (e.g. no DHW boiler connected).
 _NUMERIC_KEYS = {
@@ -217,7 +216,7 @@ class _NaturelaEntityBase(CoordinatorEntity):
         self._device_id = device_id
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device_id))},
-            "name": "Schuurkachel",
+            "name": "Pellet Stove",
             "manufacturer": MANUFACTURER,
             "model": MODEL,
         }
@@ -230,12 +229,12 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
     history graph and logbook render nicely with colored bars per state.
 
     Mapping logic:
-      - When status code is in BURNING_STATUS_CODES (2 or 8), derive power
-        label from FPower vs Power1/Power2/Power3 thresholds reported by
-        the API → returns "Power1" / "Power2" / "Power3" / "PS".
-      - Otherwise look up STATUS_NAMES (numeric or string key).
-      - Unknown codes return "Unknown" rather than raising or polluting
-        history with arbitrary values.
+    - When status code is in BURNING_STATUS_CODES (2 or 8), derive power label
+      from FPower vs Power1/Power2/Power3 thresholds reported by the API
+      → returns "Power1" / "Power2" / "Power3" / "PS".
+    - Otherwise look up STATUS_NAMES (numeric or string key).
+    - Unknown codes return "Unknown" rather than raising or polluting history
+      with arbitrary values.
     """
 
     _attr_icon = "mdi:fire-alert"
@@ -256,6 +255,7 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
         value = d.get("Status")
         if value is None:
             return None
+
         # Burning state → derive power-level label from FPower vs thresholds.
         # Matches what the Naturela controller and web portal display.
         if value in BURNING_STATUS_CODES:
@@ -273,6 +273,7 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
             if fpower > 0:
                 return "PS"
             # FPower=0 yet status burning → transitional, fall through to STATUS_NAMES
+
         label = STATUS_NAMES.get(value)
         if label is None:
             # Unknown status — log once per unique value so we can extend
@@ -284,9 +285,11 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
                 _LOGGER.warning(
                     "Naturela: unknown Status value %r (type=%s) — falling back to 'Unknown'. "
                     "Please report so it can be added to STATUS_NAMES.",
-                    value, type(value).__name__,
+                    value,
+                    type(value).__name__,
                 )
             return "Unknown"
+
         # Final safety: only return labels that are in the ENUM options list.
         if label not in STATUS_OPTIONS:
             key = ("label", label)
@@ -294,9 +297,11 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
                 _LOGGED_UNKNOWN_STATUS.add(key)
                 _LOGGER.warning(
                     "Naturela: status label %r maps from %r but is not in STATUS_OPTIONS",
-                    label, value,
+                    label,
+                    value,
                 )
             return "Unknown"
+
         return label
 
 
