@@ -1,6 +1,7 @@
 """Sensor entities for Naturela BurnerTouch pellet stove."""
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from homeassistant.components.sensor import (
@@ -148,6 +149,57 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
 )
 
 
+# Sensors whose values must always be finite numbers.  Used to guard against
+# the Naturela API returning "NaN", null, or out-of-range values on fields that
+# the stove doesn't actually measure (e.g. no DHW boiler connected).
+_NUMERIC_KEYS = {
+    "temp_boiler",
+    "temp_dhw",
+    "temp_fume",
+    "set_temp",
+    "output_power",
+    "power_kw",
+    "fire_level",
+    "fuel_consumed",
+    "main_fan",
+    "exhaust_fan",
+    "power1_threshold",
+    "power2_threshold",
+    "power3_threshold",
+}
+
+
+def _coerce_numeric(value):
+    """Convert an API value to a finite float, or return None.
+
+    Guards against:
+    - None
+    - float('nan') / float('inf')
+    - string "NaN", "null", "", etc.
+    - any value that can't be converted to a finite float
+    """
+    if value is None:
+        return None
+    # Catch actual float NaN/Inf first (isinstance check before str conversion)
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return None
+        return value
+    if isinstance(value, (int, bool)):
+        return float(value)
+    # String or other -- try to convert, treat "NaN"/"Infinity"/"" as missing
+    try:
+        s = str(value).strip()
+        if not s or s.lower() in ("nan", "null", "none", "inf", "-inf", "infinity", "-infinity"):
+            return None
+        num = float(s)
+        if not math.isfinite(num):
+            return None
+        return num
+    except (TypeError, ValueError):
+        return None
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -247,7 +299,23 @@ class NaturelaSensor(_NaturelaEntityBase, SensorEntity):
         value = self.coordinator.data.get(self.entity_description.api_key)
         if value is None:
             return None
+
         multiplier = self.entity_description.value_multiplier
+
+        # Numeric sensors must produce a finite float -- HA validates this for
+        # TEMPERATURE / POWER device classes and would otherwise show "unknown".
+        if self.entity_description.key in _NUMERIC_KEYS:
+            num = _coerce_numeric(value)
+            if num is None:
+                return None
+            if multiplier != 1.0:
+                return round(num * multiplier, 2)
+            # Preserve integer type for fields that are always whole numbers
+            if isinstance(value, int) and not isinstance(value, bool):
+                return int(num)
+            return num
+
+        # Fallback for any future non-numeric sensors
         if multiplier != 1.0:
             try:
                 return round(float(value) * multiplier, 2)
