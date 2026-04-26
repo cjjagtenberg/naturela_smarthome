@@ -34,9 +34,10 @@ def _safe_temp(value):
 HVAC_MODES = [HVACMode.OFF, HVACMode.HEAT]
 
 # Status codes where the stove is actively running / starting up
-# 0=Stand-by, 1=Ontsteking, 2=Werkt, 3=Afkoelen, 4=Fout, 5=Wachten, 6=Reinigen
+# 0=Stand-by, 1=Cleaning, 2=Burning, 3=Cool down, 4=Fault, 5=Suspend, 6=Cleaning
 # String values: older firmware may return "Firing" (ignition) or "keeping" (on temp)
-ACTIVE_STATUSES = {1, 2, 5, 6, 8, "Firing", "keeping"}  # 8 = normaal werken (observed in the field)
+ACTIVE_STATUSES = {1, 2, 5, 6, 8, "Firing", "keeping"}
+# 8 = normal operation (observed in the field)
 
 
 async def async_setup_entry(
@@ -61,13 +62,13 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
     """Represents the pellet stove as a HA climate entity.
 
     Supports:
-      - HVAC modes : OFF / HEAT
+      - HVAC modes        : OFF / HEAT
       - Target temperature control
 
     Uses optimistic state after a user command (_command_pending=True) so the
-    UI shows "Verwarmen" immediately.  The coordinator is blocked from
-    resetting the mode to OFF until the stove is confirmed running
-    (Status in ACTIVE_STATUSES) or the user explicitly turns it off.
+    UI shows "Heating" immediately.  The coordinator is blocked from resetting
+    the mode to OFF until the stove is confirmed running (Status in
+    ACTIVE_STATUSES) or the user explicitly turns it off.
     """
 
     _attr_hvac_modes = HVAC_MODES
@@ -91,7 +92,7 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         self._attr_unique_id = f"{DOMAIN}_{device_id}_climate"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device_id))},
-            "name": "Schuurkachel",
+            "name": "Pellet Stove",
             "manufacturer": MANUFACTURER,
             "model": MODEL,
         }
@@ -103,42 +104,39 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
     # ------------------------------------------------------------------
 
     def _update_from_data(self, data: dict) -> None:
-        """Update _attr_* from a data dict.  Safe to call from __init__."""
+        """Update _attr_* from a data dict. Safe to call from __init__."""
         status = data.get("Status", 0)
-        state = data.get("State", STATE_OFF)
-
+        state  = data.get("State", STATE_OFF)
         if status in ACTIVE_STATUSES or state == STATE_ON:
             self._attr_hvac_mode = HVACMode.HEAT
         else:
             self._attr_hvac_mode = HVACMode.OFF
-
         self._attr_current_temperature = _safe_temp(data.get("TempBoiler"))
-        self._attr_target_temperature = _safe_temp(data.get("SetTemp"))
+        self._attr_target_temperature  = _safe_temp(data.get("SetTemp"))
 
     def _handle_coordinator_update(self) -> None:
         """Called by the coordinator after every poll.
 
-        When _command_pending is True (user just pressed "heat") we only
-        switch to OFF if the API still reports stand-by AND the state field
-        is also 0.  Once the stove enters an active status we clear the flag.
+        When _command_pending is True (user just pressed "heat") we only switch
+        to OFF if the API still reports stand-by AND the state field is also 0.
+        Once the stove enters an active status we clear the flag.
         """
-        data = self.coordinator.data or {}
+        data   = self.coordinator.data or {}
         status = data.get("Status", 0)
-        state = data.get("State", STATE_OFF)
+        state  = data.get("State", STATE_OFF)
 
         if status in ACTIVE_STATUSES:
-            # Stove is genuinely running — clear the pending flag and set HEAT
+            # Stove is genuinely running -- clear the pending flag and set HEAT
             self._command_pending = False
-            self._attr_hvac_mode = HVACMode.HEAT
+            self._attr_hvac_mode  = HVACMode.HEAT
         elif self._command_pending:
-            # Still waiting for the stove to start — keep optimistic HEAT state
+            # Still waiting for the stove to start -- keep optimistic HEAT state
             _LOGGER.debug(
                 "Command pending, ignoring coordinator OFF (status=%s state=%s)",
-                status,
-                state,
+                status, state,
             )
         else:
-            # No pending command — follow the API faithfully
+            # No pending command -- follow the API faithfully
             if state == STATE_ON:
                 self._attr_hvac_mode = HVACMode.HEAT
             else:
@@ -146,8 +144,7 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
 
         # Always update temperatures
         self._attr_current_temperature = _safe_temp(data.get("TempBoiler"))
-        self._attr_target_temperature = _safe_temp(data.get("SetTemp"))
-
+        self._attr_target_temperature  = _safe_temp(data.get("SetTemp"))
         if self.hass is not None:
             self.async_write_ha_state()
 
@@ -162,17 +159,17 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
             return {}
         d = self.coordinator.data
         return {
-            "status": d.get("Status"),
-            "flue_temp": d.get("TempFume"),
-            "dhw_temp": d.get("TempDHW"),
-            "fire_level": d.get("FireLevel"),
-            "power_kw": d.get("FPower"),
+            "status":           d.get("Status"),
+            "flue_temp":        d.get("TempFume"),
+            "dhw_temp":         d.get("TempDHW"),
+            "fire_level":       d.get("FireLevel"),
+            "power_kw":         d.get("FPower"),
             "output_power_pct": d.get("OutputPower"),
-            "ch_pump": d.get("CHPump"),
-            "dhw_pump": d.get("DHWPump"),
+            "ch_pump":          d.get("CHPump"),
+            "dhw_pump":         d.get("DHWPump"),
             "fuel_consumed_kg": d.get("FuelConsum"),
-            "error_flag": d.get("ErrorFlag"),
-            "command_pending": self._command_pending,
+            "error_flag":       d.get("ErrorFlag"),
+            "command_pending":  self._command_pending,
             "status_name": STATUS_NAMES.get(d.get("Status", 0), f"Status {d.get('Status')}"),
         }
 
