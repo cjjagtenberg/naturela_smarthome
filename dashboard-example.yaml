@@ -1,13 +1,13 @@
-# Naturela BurnerTouch – Voorbeeld dashboard kaart voor Home Assistant
+# Naturela BurnerTouch - Voorbeeld dashboard kaart voor Home Assistant
 #
 # VEREISTE: Installeer eerst de custom card (zie README.md stap 4).
 #
-# Stap 1 – Kopieer naturela-pellet-card.js naar /config/www/
-# Stap 2 – Voeg toe als Lovelace resource:
-#   Instellingen → Dashboards → ⋮ → Resources → +
+# Stap 1 - Kopieer naturela-pellet-card.js naar /config/www/
+# Stap 2 - Voeg toe als Lovelace resource:
+#   Instellingen -> Dashboards -> ... -> Resources -> +
 #   URL: /local/naturela-pellet-card.js   Type: JavaScript module
-# Stap 3 – Herlaad de browser (Ctrl+F5 / Cmd+Shift+R)
-# Stap 4 – Plak onderstaande YAML in je dashboard via de ruwe YAML-editor
+# Stap 3 - Herlaad de browser (Ctrl+F5 / Cmd+Shift+R)
+# Stap 4 - Plak onderstaande YAML in je dashboard via de ruwe YAML-editor
 
 type: custom:naturela-pellet-card
 title: Schuur (Pellets)
@@ -15,6 +15,6 @@ climate_entity: climate.schuurkachel
 status_sensor:  sensor.schuurkachel_status
 boiler_sensor:  sensor.schuurkachel_keteltemperatuur
 flue_sensor:    sensor.schuurkachel_rookgastemperatuur
-power_sensor:   sensor.schuurkachel_vermogen
+power_sensor:   sensor.schuurkachel_thermisch_vermogen
 flame_sensor:   sensor.schuurkachel_vlamniveau
 alarm_sensor:   sensor.schuurkachel_storing
