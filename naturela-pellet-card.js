@@ -223,11 +223,12 @@ class NaturelaPelletCard extends HTMLElement {
           </div>
         </div>
         <div class="divider"></div>
-        <div class="action-row">
+      </div>
+      <div class="action-row">
           <button class="action-btn btn-aan" id="btnAan">&#9210; Aan</button>
           <button class="action-btn btn-uit" id="btnUit">&#9711; Uit</button>
-        </div>
-        <div class="info-grid">
+      </div>
+      <div class="info-grid">
           <div class="info-tile"><div class="info-tile-label">Schoorsteen</div><div class="info-tile-value">${flueT > 0 ? flueT + ' °C' : (flueT === 0 ? '0 °C' : flueT)}</div></div>
           <div class="info-tile"><div class="info-tile-label">Vermogen</div><div class="info-tile-value">${powerVal !== '-' && powerVal !== 'unknown' && powerVal !== 'unavailable' ? powerVal : '-'}</div></div>
           <div class="info-tile full-width ${pumpOn ? 'pump-active' : ''}"><div class="info-tile-label">Pomp</div><div class="info-tile-value">${pumpLabel}</div></div>
@@ -236,7 +237,6 @@ class NaturelaPelletCard extends HTMLElement {
           <div class="status-footer-label">Status</div>
           <div class="status-footer-value">${statusName}</div>
         </div>
-      </div>
     `;
     this.shadowRoot.getElementById('btnAan').addEventListener('click', () => {
       if (!this._hass || !this._config.climate_entity) return;
