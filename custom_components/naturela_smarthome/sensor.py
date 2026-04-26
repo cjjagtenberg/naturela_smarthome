@@ -167,6 +167,16 @@ SENSORS: tuple[NaturelaSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:speedometer",
     ),
+    NaturelaSensorEntityDescription(
+        key="alarm",
+        api_key="ErrorFlag",
+        name="Alarm",
+        native_unit_of_measurement=None,
+        device_class=None,
+        state_class=None,
+        icon="mdi:alert-circle",
+        null_as_zero=True,
+    ),
 )
 
 # Sensors whose values must always be finite numbers. Used to guard against
