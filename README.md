@@ -99,7 +99,7 @@ During setup you will be asked for:
 |---|---|---|
 | Email address | `name@mail.com` | Login credentials for iot.naturela-bg.com |
 | Password | `••••••••` | Password for iot.naturela-bg.com |
-| Device ID | `1234` | Visible in the URL: `/#/device/burnertouch/1234` |
+| Device ID | `6548` | Visible in the URL: `/#/device/burnertouch/6548` |
 | Poll interval | `30` | Refresh interval in seconds (default 30) |
 
 ---
@@ -155,18 +155,56 @@ The integration detects start-up via the `_command_pending` flag: as long as the
 
 ## Changelog
 
-### v11 (2026-04-01)
-- Card: static header colour (no longer dependent on status colour)
-- Card: STATUS_COLORS extended with statuses 3, 7 and 10
+### Integration
 
-### v11 (2026-03-28)
-- Card: pump tile and thermal output merged
-- Card: power_sensor renamed to thermal_output
+#### v1.3.1 (2026-05-18)
+- Full English translation: README, sensor friendly names, binary sensor names, `strings.json`
+- Added `sensor.pellet_stove_alarm` exposing the controller's `ErrorFlag` as a human-readable fault state
+- Added `close()` method to `NaturelaAPI` for clean aiohttp session teardown — fixes the `AttributeError: 'NaturelaAPI' object has no attribute 'close'` during config flow (#1)
+- `_safe_temp()` prevents NaN values for boiler and target temperature
+- Coordinator now supports both `hass.data[DOMAIN][entry.entry_id]` and `entry.runtime_data` lookup
+- Card: status handling refactor, header layout tweaks, syntax fixes
+- `manifest.json` field ordering normalised
 
-### v10 and earlier
+#### v1.3.0 (2026-04-26)
+- Status sensor now uses `SensorDeviceClass.ENUM` with literal Naturela BurnerTouch controller labels (`Stand-by`, `Cleaning`, `Unfolding fire`, `Burning`, `Power1/2/3`, `Suspend`, `Burning shutdown`, `Cool down`)
+- Power level derivation: `Burning` is split into `Power1` / `Power2` / `Power3` based on `FPower` vs threshold values reported by the API
+- WARNING log (once per unique value) for unknown Status values, to capture real-world alarm spellings
+
+#### v1.2.2 (2026-04-26)
+- Fix sensor entities going `unavailable` after setup: `sensor.py` now reads the coordinator from `hass.data[DOMAIN][entry.entry_id]` instead of the unsupported `entry.runtime_data`
+
+#### v1.2.1 (2026-04-26)
+- Fix `turn_on`/`turn_off`: `_do_post` no longer accidentally `async`
+- Fix thermal output display: show `0 kW` instead of `-` when `OutputPower` is null in standby/ignition
+
+#### v1.2.0 (2026-04-26)
+- NaN-safety for numeric sensors (`_coerce_numeric()` filters NaN/Infinity/null)
+- Re-login on session expiry — ON commands no longer silently lost
+- `climate.turn_on` / `turn_off` feature flags added
+- Status 7 ("Cool down") and 10 ("Suspend") names added
+- Power 1 / 2 / 3 derivation from `FPower` thresholds
+- Burner step (FPower) vs Thermal output (OutputPower×0.1) split into two sensors
+- ErrorFlag display with specific error names
+- Default `scan_interval` set to 10 seconds
+
+#### v1.0.0 (2026-03-27)
+- Initial release: climate entity, sensors, binary sensors, config flow UI, Lovelace custom card, 60+ language translations
+
+### Card
+
+#### v11 (2026-04-01)
+- Static header colour (no longer dependent on status colour)
+- `STATUS_COLORS` extended with statuses 3, 7 and 10
+
+#### v11 (2026-03-28)
+- Pump tile and thermal output merged
+- `power_sensor` renamed to `thermal_output`
+
+#### v10 and earlier
 - Python integration: binary sensors added
-- Python integration: Firing/keeping string statuses added to ACTIVE_STATUSES
-- Python integration: burner step / power calculation via FPower thresholds
+- Python integration: Firing/keeping string statuses added to `ACTIVE_STATUSES`
+- Python integration: burner step / power calculation via `FPower` thresholds
 
 ---
 
