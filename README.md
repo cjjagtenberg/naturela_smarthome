@@ -99,7 +99,7 @@ During setup you will be asked for:
 |---|---|---|
 | Email address | `name@mail.com` | Login credentials for iot.naturela-bg.com |
 | Password | `••••••••` | Password for iot.naturela-bg.com |
-| Device ID | `6548` | Visible in the URL: `/#/device/burnertouch/6548` |
+| Device ID | `1234` | Visible in the URL: `/#/device/burnertouch/1234` |
 | Poll interval | `30` | Refresh interval in seconds (default 30) |
 
 ---
