@@ -7,8 +7,9 @@
         "data": {
           "username": "Е-пошта адреса",
           "password": "Лозинка",
-          "device_id": "ID на уредот (од URL: /device/burnertouch/{id})",
-          "scan_interval": "Интервал на анкети (секунди, мин. 10)"
+          "device_id": "ID на уред (нумерички ID од Naturela URL, напр. 6548)",
+          "scan_interval": "Интервал на анкети (секунди, мин. 10)",
+          "controller_type": "Тип на контролер"
         }
       }
     },

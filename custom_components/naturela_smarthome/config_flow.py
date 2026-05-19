@@ -6,16 +6,49 @@ import logging
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.selector import (
+    SelectOptionDict,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+)
 
 from .api import NaturelaAPI, NaturelaAuthError, NaturelaConnectionError
-from .const import CONF_DEVICE_ID, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import (
+    CONF_CONTROLLER_TYPE,
+    CONF_DEVICE_ID,
+    CONF_SCAN_INTERVAL,
+    CONTROLLER_BURNER,
+    CONTROLLER_BURNERTOUCH,
+    CONTROLLER_MODELS,
+    DEFAULT_CONTROLLER,
+    DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
+
+CONTROLLER_SELECTOR = SelectSelector(
+    SelectSelectorConfig(
+        options=[
+            SelectOptionDict(
+                value=CONTROLLER_BURNERTOUCH,
+                label=CONTROLLER_MODELS[CONTROLLER_BURNERTOUCH],
+            ),
+            SelectOptionDict(
+                value=CONTROLLER_BURNER,
+                label=CONTROLLER_MODELS[CONTROLLER_BURNER],
+            ),
+        ],
+        mode=SelectSelectorMode.DROPDOWN,
+    )
+)
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("username"): str,
         vol.Required("password"): str,
+        vol.Required(CONF_CONTROLLER_TYPE, default=DEFAULT_CONTROLLER): CONTROLLER_SELECTOR,
         vol.Required(CONF_DEVICE_ID, default=6548): int,
         vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
             int, vol.Range(min=10, max=300)
@@ -33,6 +66,7 @@ async def _validate_credentials(
         username=data["username"],
         password=data["password"],
         device_id=data.get(CONF_DEVICE_ID, 6548),
+        controller_type=data.get(CONF_CONTROLLER_TYPE, DEFAULT_CONTROLLER),
     )
     try:
         await api.login()

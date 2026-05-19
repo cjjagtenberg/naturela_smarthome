@@ -7,8 +7,9 @@
         "data": {
           "username": "E-postadress",
           "password": "Lösenord",
-          "device_id": "Enhets-ID (från URL: /device/burnertouch/{id})",
-          "scan_interval": "Avsökningsintervall (sekunder, min. 10)"
+          "device_id": "Enhets-ID (numeriskt ID i Naturela-webbadressen, t.ex. 6548)",
+          "scan_interval": "Avsökningsintervall (sekunder, min. 10)",
+          "controller_type": "Styrenhetstyp"
         }
       }
     },

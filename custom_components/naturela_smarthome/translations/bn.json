@@ -7,8 +7,9 @@
         "data": {
           "username": "ইমেইল ঠিকানা",
           "password": "পাসওয়ার্ড",
-          "device_id": "ডিভাইস আইডি (URL থেকে: /device/burnertouch/{id})",
-          "scan_interval": "পোলিং ইন্টারভাল (সেকেন্ড, সর্বনিম্ন ১০)"
+          "device_id": "ডিভাইস আইডি (Naturela URL-এ দেখা সংখ্যাত্মক আইডি, যেমন 6548)",
+          "scan_interval": "পোলিং ইন্টারভাল (সেকেন্ড, সর্বনিম্ন ১০)",
+          "controller_type": "কন্ট্রোলার টাইপ"
         }
       }
     },

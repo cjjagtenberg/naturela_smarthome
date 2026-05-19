@@ -7,8 +7,9 @@
         "data": {
           "username": "Էլ. փոստի հասցե",
           "password": "Գաղտնաբառ",
-          "device_id": "Սարքի ID (URL-ից՝ /device/burnertouch/{id})",
-          "scan_interval": "Հարցման ընդմիջում (վայրկյան, նվ. 10)"
+          "device_id": "Սարքի ID (Naturela URL-ից թվային ID, օր.՝ 6548)",
+          "scan_interval": "Հարցման ընդմիջում (վայրկյան, նվ. 10)",
+          "controller_type": "Կարգավարի տեսակ"
         }
       }
     },

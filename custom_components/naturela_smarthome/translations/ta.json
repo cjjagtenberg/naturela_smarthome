@@ -7,8 +7,9 @@
         "data": {
           "username": "மின்னஞ்சல் முகவரி",
           "password": "கடவுச்சொல்",
-          "device_id": "சாதன ஐடி (URL இலிருந்து: /device/burnertouch/{id})",
-          "scan_interval": "வாக்கெடுப்பு இடைவெளி (நொடிகள், குறைந்தபட்சம் 10)"
+          "device_id": "சாதன ID (Naturela URL இல் உள்ள எண் ID, எ.கா. 6548)",
+          "scan_interval": "வாக்கெடுப்பு இடைவெளி (நொடிகள், குறைந்தபட்சம் 10)",
+          "controller_type": "கட்டுப்படுத்தி வகை"
         }
       }
     },

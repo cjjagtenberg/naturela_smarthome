@@ -7,8 +7,9 @@
         "data": {
           "username": "ఇమెయిల్ చిరునామా",
           "password": "పాస్వర్డ్",
-          "device_id": "పరికర ID (URL నుండి: /device/burnertouch/{id})",
-          "scan_interval": "పోలింగ్ విరామం (సెకన్లు, కనీసం 10)"
+          "device_id": "పరికర ID (Naturela URL లోని సంఖ్యా ID, ఉదా. 6548)",
+          "scan_interval": "పోలింగ్ విరామం (సెకన్లు, కనీసం 10)",
+          "controller_type": "కంట్రోలర్ రకం"
         }
       }
     },

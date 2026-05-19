@@ -7,8 +7,9 @@
         "data": {
           "username": "آدرس ایمیل",
           "password": "رمز عبور",
-          "device_id": "شناسه دستگاه (از URL: /device/burnertouch/{id})",
-          "scan_interval": "فاصله نظرسنجی (ثانیه، حداقل ۱۰)"
+          "device_id": "شناسه دستگاه (شناسه عددی در نشانی Naturela، مثال 6548)",
+          "scan_interval": "فاصله نظرسنجی (ثانیه، حداقل ۱۰)",
+          "controller_type": "نوع کنترلر"
         }
       }
     },

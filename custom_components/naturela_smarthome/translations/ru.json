@@ -7,8 +7,9 @@
         "data": {
           "username": "Адрес электронной почты",
           "password": "Пароль",
-          "device_id": "ID устройства (из URL: /device/burnertouch/{id})",
-          "scan_interval": "Интервал опроса (секунды, мин. 10)"
+          "device_id": "ID устройства (числовой ID из URL Naturela, напр. 6548)",
+          "scan_interval": "Интервал опроса (секунды, мин. 10)",
+          "controller_type": "Тип контроллера"
         }
       }
     },

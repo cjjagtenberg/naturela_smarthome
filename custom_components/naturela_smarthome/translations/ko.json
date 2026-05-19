@@ -7,8 +7,9 @@
         "data": {
           "username": "이메일 주소",
           "password": "비밀번호",
-          "device_id": "기기 ID (URL에서: /device/burnertouch/{id})",
-          "scan_interval": "폴링 간격 (초, 최소 10)"
+          "device_id": "장치 ID (Naturela URL의 숫자 ID, 예: 6548)",
+          "scan_interval": "폴링 간격 (초, 최소 10)",
+          "controller_type": "컨트롤러 유형"
         }
       }
     },

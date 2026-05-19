@@ -7,8 +7,9 @@
         "data": {
           "username": "E-posadres",
           "password": "Wagwoord",
-          "device_id": "Toestel-ID (van URL: /device/burnertouch/{id})",
-          "scan_interval": "Peilinginterval (sekondes, min. 10)"
+          "device_id": "Toestel-ID (numeriese ID in die Naturela-URL, bv. 6548)",
+          "scan_interval": "Peilinginterval (sekondes, min. 10)",
+          "controller_type": "Beheerderstipe"
         }
       }
     },

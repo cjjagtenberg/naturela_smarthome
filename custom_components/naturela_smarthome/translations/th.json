@@ -7,8 +7,9 @@
         "data": {
           "username": "ที่อยู่อีเมล",
           "password": "รหัสผ่าน",
-          "device_id": "รหัสอุปกรณ์ (จาก URL: /device/burnertouch/{id})",
-          "scan_interval": "ช่วงเวลาการสำรวจ (วินาที, น้อยสุด 10)"
+          "device_id": "ID อุปกรณ์ (ID ตัวเลขที่อยู่ใน URL ของ Naturela เช่น 6548)",
+          "scan_interval": "ช่วงเวลาการสำรวจ (วินาที, น้อยสุด 10)",
+          "controller_type": "ประเภทคอนโทรลเลอร์"
         }
       }
     },

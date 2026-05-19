@@ -7,8 +7,9 @@
         "data": {
           "username": "El. pašto adresas",
           "password": "Slaptažodis",
-          "device_id": "Įrenginio ID (iš URL: /device/burnertouch/{id})",
-          "scan_interval": "Apklausos intervalas (sekundės, min. 10)"
+          "device_id": "Įrenginio ID (skaitinis ID Naturela URL adrese, pvz., 6548)",
+          "scan_interval": "Apklausos intervalas (sekundės, min. 10)",
+          "controller_type": "Valdiklio tipas"
         }
       }
     },

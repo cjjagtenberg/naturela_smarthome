@@ -7,8 +7,9 @@
         "data": {
           "username": "电子邮件地址",
           "password": "密码",
-          "device_id": "设备 ID（从 URL: /device/burnertouch/{id}）",
-          "scan_interval": "轮询间隔（秒，最少 10）"
+          "device_id": "设备 ID (Naturela 网址中的数字 ID，例如 6548)",
+          "scan_interval": "轮询间隔（秒，最少 10）",
+          "controller_type": "控制器类型"
         }
       }
     },

@@ -7,8 +7,9 @@
         "data": {
           "username": "ელ-ფოსტის მისამართი",
           "password": "პაროლი",
-          "device_id": "მოწყობილობის ID (URL-დან: /device/burnertouch/{id})",
-          "scan_interval": "გამოკითხვის ინტერვალი (წამები, მინ. 10)"
+          "device_id": "მოწყობილობის ID (Naturela URL-დან რიცხვი, მაგ. 6548)",
+          "scan_interval": "გამოკითხვის ინტერვალი (წამები, მინ. 10)",
+          "controller_type": "კონტროლერის ტიპი"
         }
       }
     },

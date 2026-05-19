@@ -7,8 +7,9 @@
         "data": {
           "username": "Adreça de correu electrónic",
           "password": "Contrasenya",
-          "device_id": "ID del dispositiu (des de l'URL: /device/burnertouch/{id})",
-          "scan_interval": "Interval de sondeig (segons, mínim 10)"
+          "device_id": "ID del dispositiu (ID numèric visible a l'URL de Naturela, p. ex. 6548)",
+          "scan_interval": "Interval de sondeig (segons, mínim 10)",
+          "controller_type": "Tipus de controlador"
         }
       }
     },

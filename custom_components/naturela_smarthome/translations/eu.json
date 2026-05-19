@@ -7,8 +7,9 @@
         "data": {
           "username": "Helbide elektronikoa",
           "password": "Pasahitza",
-          "device_id": "Gailuaren IDa (URL-etik: /device/burnertouch/{id})",
-          "scan_interval": "Inkesta-tartea (segundoak, gut. 10)"
+          "device_id": "Gailu ID (Naturela URL-an ageri den ID zenbakia, adib. 6548)",
+          "scan_interval": "Inkesta-tartea (segundoak, gut. 10)",
+          "controller_type": "Kontrolagailu mota"
         }
       }
     },

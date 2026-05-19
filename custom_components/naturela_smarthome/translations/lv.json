@@ -7,8 +7,9 @@
         "data": {
           "username": "E-pasta adrese",
           "password": "Parole",
-          "device_id": "Ierīces ID (no URL: /device/burnertouch/{id})",
-          "scan_interval": "Aptaujas intervāls (sekundes, min. 10)"
+          "device_id": "Ierīces ID (skaitlisks ID Naturela URL-ā, piem., 6548)",
+          "scan_interval": "Aptaujas intervāls (sekundes, min. 10)",
+          "controller_type": "Kontroliera tips"
         }
       }
     },

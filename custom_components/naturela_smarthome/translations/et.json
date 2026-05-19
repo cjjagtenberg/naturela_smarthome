@@ -7,8 +7,9 @@
         "data": {
           "username": "E-posti aadress",
           "password": "Parool",
-          "device_id": "Seadme ID (URL-ist: /device/burnertouch/{id})",
-          "scan_interval": "Päringuintervall (sekundit, min. 10)"
+          "device_id": "Seadme ID (numbriline ID Naturela URL-is, nt 6548)",
+          "scan_interval": "Päringuintervall (sekundit, min. 10)",
+          "controller_type": "Kontrolleri tüüp"
         }
       }
     },

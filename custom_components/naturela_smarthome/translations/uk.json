@@ -7,8 +7,9 @@
         "data": {
           "username": "Адреса Електронної пошти",
           "password": "Пароль",
-          "device_id": "ID пристрою (з URL: /device/burnertouch/{id})",
-          "scan_interval": "Інтервал опитування (секунди, хв. 10)"
+          "device_id": "ID пристрою (числовий ID з URL Naturela, напр. 6548)",
+          "scan_interval": "Інтервал опитування (секунди, хв. 10)",
+          "controller_type": "Тип контролера"
         }
       }
     },

@@ -7,8 +7,9 @@
         "data": {
           "username": "Ðịa chỉ email",
           "password": "Mật khẩu",
-          "device_id": "ID thiết bị (từ URL: /device/burnertouch/{id})",
-          "scan_interval": "Khoảng thời gian thăm dò (giây, tối thiểu 10)"
+          "device_id": "ID thiết bị (ID dạng số trong URL Naturela, ví dụ 6548)",
+          "scan_interval": "Khoảng thời gian thăm dò (giây, tối thiểu 10)",
+          "controller_type": "Loại bộ điều khiển"
         }
       }
     },

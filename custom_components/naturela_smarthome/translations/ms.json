@@ -7,8 +7,9 @@
         "data": {
           "username": "Alamat e-mel",
           "password": "Kata laluan",
-          "device_id": "ID Peranti (dari URL: /device/burnertouch/{id})",
-          "scan_interval": "Selang pengundian (saat, min. 10)"
+          "device_id": "ID Peranti (ID berangka dari URL Naturela, cth. 6548)",
+          "scan_interval": "Selang pengundian (saat, min. 10)",
+          "controller_type": "Jenis pengawal"
         }
       }
     },

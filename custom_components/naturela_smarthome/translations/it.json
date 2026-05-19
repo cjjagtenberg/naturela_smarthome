@@ -7,8 +7,9 @@
         "data": {
           "username": "Indirizzo e-mail",
           "password": "Password",
-          "device_id": "ID dispositivo (dall'URL: /device/burnertouch/{id})",
-          "scan_interval": "Intervallo di polling (secondi, min. 10)"
+          "device_id": "ID dispositivo (ID numerico visibile nell'URL Naturela, es. 6548)",
+          "scan_interval": "Intervallo di polling (secondi, min. 10)",
+          "controller_type": "Tipo di controller"
         }
       }
     },

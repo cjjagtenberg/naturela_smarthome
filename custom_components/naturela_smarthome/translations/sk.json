@@ -7,8 +7,9 @@
         "data": {
           "username": "E-mailová adresa",
           "password": "Heslo",
-          "device_id": "ID zariadenia (z URL: /device/burnertouch/{id})",
-          "scan_interval": "Interval dopytovania (sekundy, min. 10)"
+          "device_id": "ID zariadenia (číselné ID viditeľné v URL Naturela, napr. 6548)",
+          "scan_interval": "Interval dopytovania (sekundy, min. 10)",
+          "controller_type": "Typ regulátora"
         }
       }
     },

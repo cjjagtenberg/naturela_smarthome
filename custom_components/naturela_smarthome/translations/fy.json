@@ -7,8 +7,9 @@
         "data": {
           "username": "E-mailadres",
           "password": "Wachtwurd",
-          "device_id": "Apparaat-ID (fan URL: /device/burnertouch/{id})",
-          "scan_interval": "Frikwinsje-ynterfal (sekonden, min. 10)"
+          "device_id": "Apparaat-ID (numeryk ID dat yn jo Naturela web-URL stiet, bygelyks 6548)",
+          "scan_interval": "Frikwinsje-ynterfal (sekonden, min. 10)",
+          "controller_type": "Ketel-type"
         }
       }
     },

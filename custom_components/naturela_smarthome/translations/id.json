@@ -7,8 +7,9 @@
         "data": {
           "username": "Alamat email",
           "password": "Kata sandi",
-          "device_id": "ID Perangkat (dari URL: /device/burnertouch/{id})",
-          "scan_interval": "Interval polling (detik, min. 10)"
+          "device_id": "ID Perangkat (ID numerik dari URL Naturela, mis. 6548)",
+          "scan_interval": "Interval polling (detik, min. 10)",
+          "controller_type": "Tipe kontroler"
         }
       }
     },

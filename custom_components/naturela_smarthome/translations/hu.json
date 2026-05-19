@@ -7,8 +7,9 @@
         "data": {
           "username": "E-mail cím",
           "password": "Jelszó",
-          "device_id": "Eszközazonosító (URL-ből: /device/burnertouch/{id})",
-          "scan_interval": "Lekérdezési intervallum (másodperc, min. 10)"
+          "device_id": "Eszközazonosító (numerikus ID a Naturela URL-ben, pl. 6548)",
+          "scan_interval": "Lekérdezési intervallum (másodperc, min. 10)",
+          "controller_type": "Vezérlő típusa"
         }
       }
     },

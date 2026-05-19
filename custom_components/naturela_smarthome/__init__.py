@@ -12,7 +12,14 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import NaturelaAPI, NaturelaAuthError, NaturelaConnectionError
-from .const import CONF_DEVICE_ID, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import (
+    CONF_CONTROLLER_TYPE,
+    CONF_DEVICE_ID,
+    CONF_SCAN_INTERVAL,
+    DEFAULT_CONTROLLER,
+    DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         username=entry.data["username"],
         password=entry.data["password"],
         device_id=entry.data.get(CONF_DEVICE_ID, 6548),
+        controller_type=entry.data.get(CONF_CONTROLLER_TYPE, DEFAULT_CONTROLLER),
     )
 
     try:

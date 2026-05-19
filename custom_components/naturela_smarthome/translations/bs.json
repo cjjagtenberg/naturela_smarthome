@@ -7,8 +7,9 @@
         "data": {
           "username": "Email adresa",
           "password": "Lozinka",
-          "device_id": "ID uređaja (iz URL-a: /device/burnertouch/{id})",
-          "scan_interval": "Interval ankete (sekunde, min. 10)"
+          "device_id": "ID uređaja (numerički ID iz Naturela URL-a, npr. 6548)",
+          "scan_interval": "Interval ankete (sekunde, min. 10)",
+          "controller_type": "Tip kontrolera"
         }
       }
     },

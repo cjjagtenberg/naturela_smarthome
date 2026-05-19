@@ -7,8 +7,9 @@
         "data": {
           "username": "E-posta adresi",
           "password": "Şifre",
-          "device_id": "Cihaz Kimliği (URL'den: /device/burnertouch/{id})",
-          "scan_interval": "Yoklama aralığı (saniye, min. 10)"
+          "device_id": "Cihaz Kimliği (Naturela URL'sinde görünen sayısal ID, örn. 6548)",
+          "scan_interval": "Yoklama aralığı (saniye, min. 10)",
+          "controller_type": "Kontrolör tipi"
         }
       }
     },

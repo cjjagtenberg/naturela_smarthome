@@ -7,8 +7,9 @@
         "data": {
           "username": "Netfang",
           "password": "Lykilorð",
-          "device_id": "Tæki-ID (frá URL: /device/burnertouch/{id})",
-          "scan_interval": "Fyrirspurnarabil (sekúndur, lágm. 10)"
+          "device_id": "Tæki ID (númerískt ID í Naturela-vefslóðinni, t.d. 6548)",
+          "scan_interval": "Fyrirspurnarabil (sekúndur, lágm. 10)",
+          "controller_type": "Stýringartegund"
         }
       }
     },

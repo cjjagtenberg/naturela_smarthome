@@ -7,8 +7,9 @@
         "data": {
           "username": "メールアドレス",
           "password": "パスワード",
-          "device_id": "デバイス ID（URL から: /device/burnertouch/{id}）",
-          "scan_interval": "ポーリング間隔（秒、最低 10）"
+          "device_id": "デバイスID (Naturela URL内の数値ID、例: 6548)",
+          "scan_interval": "ポーリング間隔（秒、最低 10）",
+          "controller_type": "コントローラータイプ"
         }
       }
     },

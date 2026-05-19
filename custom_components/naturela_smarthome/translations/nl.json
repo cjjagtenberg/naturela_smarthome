@@ -7,8 +7,9 @@
         "data": {
           "username": "E-mailadres",
           "password": "Wachtwoord",
-          "device_id": "Apparaat-ID (zie URL: /device/burnertouch/{id})",
-          "scan_interval": "Poll-interval (seconden, min. 10)"
+          "device_id": "Apparaat-ID (numeriek ID dat in je Naturela web-URL staat, bijv. 6548)",
+          "scan_interval": "Poll-interval (seconden, min. 10)",
+          "controller_type": "Ketel-type"
         }
       }
     },

@@ -7,8 +7,9 @@
         "data": {
           "username": "Sähköpostiosoite",
           "password": "Salasana",
-          "device_id": "Laitteen ID (URL:stä: /device/burnertouch/{id})",
-          "scan_interval": "Kyselyväli (sekuntia, min. 10)"
+          "device_id": "Laite-ID (numeerinen ID Naturelan URL-osoitteessa, esim. 6548)",
+          "scan_interval": "Kyselyväli (sekuntia, min. 10)",
+          "controller_type": "Ohjaintyyppi"
         }
       }
     },

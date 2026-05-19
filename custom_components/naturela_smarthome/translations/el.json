@@ -7,8 +7,9 @@
         "data": {
           "username": "Διεύθυνση email",
           "password": "Κωδικός πρόσβασης",
-          "device_id": "ID συσκευής (από URL: /device/burnertouch/{id})",
-          "scan_interval": "Διάστημα δειγματοληψίας (δευτερόλεπτα, ελάχ. 10)"
+          "device_id": "Αναγνωριστικό συσκευής (αριθμητικό ID από το URL Naturela, π.χ. 6548)",
+          "scan_interval": "Διάστημα δειγματοληψίας (δευτερόλεπτα, ελάχ. 10)",
+          "controller_type": "Τύπος ελεγκτή"
         }
       }
     },

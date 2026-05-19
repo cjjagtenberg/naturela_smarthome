@@ -2,17 +2,50 @@
 
 DOMAIN = "naturela_smarthome"
 MANUFACTURER = "Naturela"
-MODEL = "BurnerTouch"
 
 CONF_DEVICE_ID = "device_id"
 CONF_SCAN_INTERVAL = "scan_interval"
+CONF_CONTROLLER_TYPE = "controller_type"
 DEFAULT_SCAN_INTERVAL = 30  # seconds
+
+# Controller types — corresponds to the endpoint segment used in
+# iot.naturela-bg.com/api/{controller_type} and the URL shown in the
+# Naturela web UI (/#/device/{controller_type}/<id>).
+CONTROLLER_BURNERTOUCH = "burnertouch"   # NPBC_V6T_2 (BurnerTouch)
+CONTROLLER_BURNER = "burner"             # NPBC-V3C-1 and older
+DEFAULT_CONTROLLER = CONTROLLER_BURNERTOUCH
+
+CONTROLLER_MODELS = {
+    CONTROLLER_BURNERTOUCH: "BurnerTouch (NPBC_V6T_2)",
+    CONTROLLER_BURNER: "NPBC-V3C-1",
+}
+# Back-compat alias used by climate/sensor/binary_sensor device_info.
+# Platforms may also call get_model(controller_type) for the precise name.
+MODEL = "BurnerTouch"
+
+
+def get_model(controller_type: str) -> str:
+    """Return a human-readable model label for the given controller type."""
+    return CONTROLLER_MODELS.get(controller_type, MODEL)
+
 
 BASE_URL = "https://iot.naturela-bg.com"
 LOGIN_URL = f"{BASE_URL}/account/login"
-API_URL = f"{BASE_URL}/api/burnertouch"
-SET_STATE_URL = f"{BASE_URL}/api/burnertouch/setState"   # confirmed from web UI
-SET_TEMP_URL  = f"{BASE_URL}/api/burnertouch/setTemperature"  # confirmed from web UI
+
+
+def build_api_urls(controller_type: str) -> tuple[str, str, str]:
+    """Return (API_URL, SET_STATE_URL, SET_TEMP_URL) for a controller type."""
+    ct = controller_type or DEFAULT_CONTROLLER
+    return (
+        f"{BASE_URL}/api/{ct}",
+        f"{BASE_URL}/api/{ct}/setState",
+        f"{BASE_URL}/api/{ct}/setTemperature",
+    )
+
+
+# Back-compat module-level URLs (point at BurnerTouch, the original target).
+# New code should call build_api_urls(controller_type) instead.
+API_URL, SET_STATE_URL, SET_TEMP_URL = build_api_urls(DEFAULT_CONTROLLER)
 
 # Device state values (confirmed by capturing Naturela web UI XHR requests)
 # The web UI sends {"deviceId": "<serial>", "state": 128} for ON

@@ -7,8 +7,9 @@
         "data": {
           "username": "Adresă de e-mail",
           "password": "Parolă",
-          "device_id": "ID dispozitiv (din URL: /device/burnertouch/{id})",
-          "scan_interval": "Interval de interogare (secunde, min. 10)"
+          "device_id": "ID dispozitiv (ID numeric vizibil în URL-ul Naturela, ex. 6548)",
+          "scan_interval": "Interval de interogare (secunde, min. 10)",
+          "controller_type": "Tip controler"
         }
       }
     },

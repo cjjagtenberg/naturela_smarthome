@@ -7,8 +7,9 @@
         "data": {
           "username": "כתובת אימייל",
           "password": "סיסמה",
-          "device_id": "מזהה המכשיר (מה-URL: /device/burnertouch/{id})",
-          "scan_interval": "מרווח סריקה (שניות, מינ' 10)"
+          "device_id": "מזהה מכשיר (מזהה מספרי בכתובת Naturela, למשל 6548)",
+          "scan_interval": "מרווח סריקה (שניות, מינ' 10)",
+          "controller_type": "סוג בקר"
         }
       }
     },

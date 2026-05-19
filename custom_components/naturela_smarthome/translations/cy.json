@@ -7,8 +7,9 @@
         "data": {
           "username": "Cyfeiriad e-bost",
           "password": "Cyfrinair",
-          "device_id": "ID Dyfais (o'r URL: /device/burnertouch/{id})",
-          "scan_interval": "Cyfwng pleidleisio (eiliadau, lleiaf 10)"
+          "device_id": "ID Dyfais (rhif ID a welir yn URL Naturela, e.e. 6548)",
+          "scan_interval": "Cyfwng pleidleisio (eiliadau, lleiaf 10)",
+          "controller_type": "Math o reolwr"
         }
       }
     },
