@@ -7,7 +7,7 @@ from typing import Any
 
 import aiohttp
 
-from .const import API_URL, LOGIN_URL, SET_STATE_URL, SET_TEMP_URL
+from .const import DEFAULT_CONTROLLER, LOGIN_URL, build_api_urls
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,10 +23,20 @@ class NaturelaConnectionError(Exception):
 class NaturelaAPI:
     """Client for the Naturela Smarthome cloud API."""
 
-    def __init__(self, username: str, password: str, device_id: int) -> None:
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        device_id: int,
+        controller_type: str = DEFAULT_CONTROLLER,
+    ) -> None:
         self._username = username
         self._password = password
         self._device_id = device_id
+        self._controller_type = controller_type or DEFAULT_CONTROLLER
+        self._api_url, self._set_state_url, self._set_temp_url = build_api_urls(
+            self._controller_type,
+        )
         self._device_serial: str | None = None  # populated from DeviceID in API response
         self._session: aiohttp.ClientSession | None = None
         self._logged_in = False
@@ -90,7 +100,7 @@ class NaturelaAPI:
             await self.login()
 
         session = await self._get_session()
-        url = f"{API_URL}/{self._device_id}"
+        url = f"{self._api_url}/{self._device_id}"
         try:
             async with session.get(url) as resp:
                 if resp.status == 401:
@@ -129,7 +139,7 @@ class NaturelaAPI:
         device_id = self._device_serial or str(self._device_id)
         return await self._post_command(
             {"deviceId": device_id, "state": state},
-            url=SET_STATE_URL,
+            url=self._set_state_url,
         )
 
     async def set_temperature(self, temperature: float) -> bool:
@@ -139,18 +149,20 @@ class NaturelaAPI:
         device_id = self._device_serial or str(self._device_id)
         _LOGGER.debug(
             "set_temperature: sending %s to %s for device %s",
-            int(temperature), SET_TEMP_URL, device_id,
+            int(temperature), self._set_temp_url, device_id,
         )
         return await self._post_command(
             {"deviceId": device_id, "temperature": int(temperature)},
-            url=SET_TEMP_URL,
+            url=self._set_temp_url,
         )
 
-    async def _post_command(self, payload: dict, url: str = SET_STATE_URL) -> bool:
+    async def _post_command(self, payload: dict, url: str | None = None) -> bool:
         """POST a command; re-login once if the session has expired."""
         if not self._logged_in:
             await self.login()
         session = await self._get_session()
+        if url is None:
+            url = self._set_state_url
 
         def _do_post():
             return session.post(
