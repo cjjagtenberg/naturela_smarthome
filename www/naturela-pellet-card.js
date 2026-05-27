@@ -136,7 +136,8 @@ class NaturelaPelletCard extends HTMLElement {
 
     const si       = getStatusInfo(statusRaw);
     const statusName = si.name;
-    const headerBg   = isOn ? (si.bg || HEADER_COLOR) : HEADER_COLOR;
+    const headerBg   = isOn ? (si.bg || HEADER_COLOR) : 'var(--secondary-background-color, #37474F)';
+    const headerText = isOn ? '#fff' : 'var(--primary-text-color, #e0e0e0)';
     const title      = cfg.title || 'Pellet Stove';
 
     this.shadowRoot.innerHTML = `
@@ -152,7 +153,7 @@ class NaturelaPelletCard extends HTMLElement {
         }
         .header {
           background: ${headerBg};
-          color: #fff;
+          color: ${headerText};
           padding: 14px 16px 12px;
           display: flex;
           align-items: center;
@@ -160,7 +161,7 @@ class NaturelaPelletCard extends HTMLElement {
         }
         .header-icon  { font-size: 1.4em; line-height: 1; }
         .header-texts { flex: 1; }
-        .header-title { font-size: 1.05em; font-weight: 600; line-height: 1.2; color: #fff; }
+        .header-title { font-size: 1.05em; font-weight: 600; line-height: 1.2; color: ${headerText}; }
         .header-sub   { font-size: 0.8em; opacity: 0.85; margin-top: 1px; }
         .temps-row {
           display: flex;
