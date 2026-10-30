@@ -21,5 +21,105 @@
     "abort": {
       "already_configured": "Dit apparaat is al geconfigureerd"
     }
+  },
+  "entity": {
+    "number": {
+      "burn_duration": {
+        "name": "Nalooptijd"
+      },
+      "delay": {
+        "name": "Voorlooptijd"
+      }
+    },
+    "button": {
+      "start_timer": {
+        "name": "Start timer"
+      },
+      "start_for_duration": {
+        "name": "Stoken voor stookduur"
+      },
+      "off_after_duration": {
+        "name": "Uit na stookduur"
+      },
+      "cancel_schedule": {
+        "name": "Planning annuleren"
+      }
+    },
+    "datetime": {
+      "scheduled_on": {
+        "name": "Aan om"
+      },
+      "scheduled_off": {
+        "name": "Uit om"
+      }
+    },
+    "sensor": {
+      "next_on": {
+        "name": "Gepland aan"
+      },
+      "next_off": {
+        "name": "Gepland uit"
+      }
+    }
+  },
+  "services": {
+    "turn_off_in": {
+      "name": "Uit over",
+      "description": "Zet de kachel uit na de opgegeven duur.",
+      "fields": {
+        "duration": {
+          "name": "Duur",
+          "description": "Tijd tot de kachel uitgaat."
+        }
+      }
+    },
+    "turn_on_for": {
+      "name": "Aan voor",
+      "description": "Zet de kachel nu aan en na de opgegeven duur weer uit.",
+      "fields": {
+        "duration": {
+          "name": "Duur",
+          "description": "Hoe lang de kachel moet stoken."
+        }
+      }
+    },
+    "turn_on_at": {
+      "name": "Aan om",
+      "description": "Zet de kachel aan op de opgegeven datum en tijd.",
+      "fields": {
+        "datetime": {
+          "name": "Datum en tijd",
+          "description": "Moment waarop de kachel aangaat."
+        }
+      }
+    },
+    "turn_off_at": {
+      "name": "Uit om",
+      "description": "Zet de kachel uit op de opgegeven datum en tijd.",
+      "fields": {
+        "datetime": {
+          "name": "Datum en tijd",
+          "description": "Moment waarop de kachel uitgaat."
+        }
+      }
+    },
+    "cancel_schedule": {
+      "name": "Planning annuleren",
+      "description": "Verwijder alle geplande aan- en uitmomenten."
+    },
+    "start_timer": {
+      "name": "Start timer",
+      "description": "Zet de kachel aan na de voorlooptijd en weer uit na de nalooptijd.",
+      "fields": {
+        "delay": {
+          "name": "Voorlooptijd",
+          "description": "Tijd tot de kachel aangaat (0 = nu)."
+        },
+        "duration": {
+          "name": "Nalooptijd",
+          "description": "Hoe lang de kachel stookt zodra hij aan is."
+        }
+      }
+    }
   }
 }

@@ -1,0 +1,70 @@
+turn_off_in:
+  target:
+    entity:
+      integration: naturela_smarthome
+      domain: climate
+  fields:
+    duration:
+      required: true
+      example: "02:00:00"
+      selector:
+        duration:
+
+turn_on_for:
+  target:
+    entity:
+      integration: naturela_smarthome
+      domain: climate
+  fields:
+    duration:
+      required: true
+      example: "03:00:00"
+      selector:
+        duration:
+
+turn_on_at:
+  target:
+    entity:
+      integration: naturela_smarthome
+      domain: climate
+  fields:
+    datetime:
+      required: true
+      example: "2026-10-30 16:00:00"
+      selector:
+        datetime:
+
+turn_off_at:
+  target:
+    entity:
+      integration: naturela_smarthome
+      domain: climate
+  fields:
+    datetime:
+      required: true
+      example: "2026-10-30 20:00:00"
+      selector:
+        datetime:
+
+cancel_schedule:
+  target:
+    entity:
+      integration: naturela_smarthome
+      domain: climate
+
+start_timer:
+  target:
+    entity:
+      integration: naturela_smarthome
+      domain: climate
+  fields:
+    delay:
+      required: true
+      example: "01:30:00"
+      selector:
+        duration:
+    duration:
+      required: true
+      example: "03:00:00"
+      selector:
+        duration:

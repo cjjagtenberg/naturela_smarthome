@@ -21,5 +21,105 @@
     "abort": {
       "already_configured": "This device is already configured"
     }
+  },
+  "entity": {
+    "number": {
+      "burn_duration": {
+        "name": "Burn duration"
+      },
+      "delay": {
+        "name": "Delay"
+      }
+    },
+    "button": {
+      "start_timer": {
+        "name": "Start timer"
+      },
+      "start_for_duration": {
+        "name": "Burn for duration"
+      },
+      "off_after_duration": {
+        "name": "Turn off after duration"
+      },
+      "cancel_schedule": {
+        "name": "Cancel schedule"
+      }
+    },
+    "datetime": {
+      "scheduled_on": {
+        "name": "Turn on at"
+      },
+      "scheduled_off": {
+        "name": "Turn off at"
+      }
+    },
+    "sensor": {
+      "next_on": {
+        "name": "Scheduled on"
+      },
+      "next_off": {
+        "name": "Scheduled off"
+      }
+    }
+  },
+  "services": {
+    "turn_off_in": {
+      "name": "Turn off in",
+      "description": "Turn the stove off after the given duration.",
+      "fields": {
+        "duration": {
+          "name": "Duration",
+          "description": "Time until the stove turns off."
+        }
+      }
+    },
+    "turn_on_for": {
+      "name": "Turn on for",
+      "description": "Turn the stove on now and off again after the given duration.",
+      "fields": {
+        "duration": {
+          "name": "Duration",
+          "description": "How long the stove should burn."
+        }
+      }
+    },
+    "turn_on_at": {
+      "name": "Turn on at",
+      "description": "Turn the stove on at the given date and time.",
+      "fields": {
+        "datetime": {
+          "name": "Date and time",
+          "description": "Moment the stove turns on."
+        }
+      }
+    },
+    "turn_off_at": {
+      "name": "Turn off at",
+      "description": "Turn the stove off at the given date and time.",
+      "fields": {
+        "datetime": {
+          "name": "Date and time",
+          "description": "Moment the stove turns off."
+        }
+      }
+    },
+    "cancel_schedule": {
+      "name": "Cancel schedule",
+      "description": "Remove all planned on and off moments."
+    },
+    "start_timer": {
+      "name": "Start timer",
+      "description": "Turn the stove on after a delay and off again after the burn duration.",
+      "fields": {
+        "delay": {
+          "name": "Delay",
+          "description": "Time until the stove turns on (0 = now)."
+        },
+        "duration": {
+          "name": "Burn duration",
+          "description": "How long the stove burns once on."
+        }
+      }
+    }
   }
 }

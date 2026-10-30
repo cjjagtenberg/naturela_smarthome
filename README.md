@@ -24,7 +24,7 @@ Control your **Naturela BurnerTouch pellet stove** from Home Assistant — via t
 - Dynamic **colour feedback** in the dashboard:
   - 🟡 Amber = Ignition in progress (status 1)
   - 🟠 Deep orange = Stove burning (status 2 / 8)
-  - Grey = Stand-by / Off
+  - Grey = Standby / Off
 
 ### Sensors
 
@@ -51,20 +51,61 @@ Control your **Naturela BurnerTouch pellet stove** from Home Assistant — via t
 | Thermostat | Input active |
 | External stop | Input active |
 
+### Timer and schedule (v1.4.0+)
+
+| Entity | Type | Description |
+|---|---|---|
+| Delay | `number` | Hours (0 to 24, step 0.25) until the stove turns on with *Start timer* (0 = now) |
+| Burn duration | `number` | Hours (0.5 to 12) the stove burns before it turns off again |
+| Start timer | `button` | Turn on after the delay, then off after the burn duration |
+| Burn for duration | `button` | Turn on now, turn off after the burn duration |
+| Turn off after duration | `button` | Turn off after the burn duration (stove already running) |
+| Cancel schedule | `button` | Remove all planned on/off moments |
+| Turn on at / Turn off at | `datetime` | Plan a one-off on or off moment |
+| Scheduled on / Scheduled off | `sensor` | Next planned moment (timestamp) |
+
+Services (target the climate entity): `naturela_smarthome.start_timer` (`delay`, `duration`), `turn_off_in`, `turn_on_for` (`duration`), `turn_on_at`, `turn_off_at` (`datetime`) and `cancel_schedule`.
+
+```yaml
+action: naturela_smarthome.start_timer
+target:
+  entity_id: climate.pellet_stove
+data:
+  delay: "01:30:00"
+  duration: "03:00:00"
+```
+
+```yaml
+action: naturela_smarthome.turn_on_at
+target:
+  entity_id: climate.pellet_stove
+data:
+  datetime: "2026-10-30 16:00:00"
+```
+
+- The schedule is stored and survives a Home Assistant restart. Moments that passed while HA was down are discarded (logged as a warning), not executed late.
+- Turning the stove off via HA cancels a pending turn-off, unless a turn-on is still planned.
+- Times without a time zone are interpreted in HA's configured time zone.
+
 ### Status codes
 
-| Code | Name | Meaning |
-|---|---|---|
-| 0 | Stand-by | Stove inactive |
-| 1 | Cleaning | Start phase – pellets igniting |
-| 2 | Burning | Normal operation |
-| 3 | Unfolding fire | Flame build-up after ignition (flue gas +5 °C trigger) |
-| 4 | Fault | Error / alarm |
-| 5 | Suspend | Waiting for start signal |
-| 6 | Suspend | Entering suspend (P1 modulation just before) |
-| 7 | Burning shutdown | Ramp-down phase (P3→P2→P1, 60 s each) |
-| 8 | Burning | Normal operation (alternative code) |
-| 10 | Cool down | Final cool-down phase (FPower=0) |
+The status sensor shows the literal labels of the Naturela `BurnStatus` enum, exactly as the Naturela web portal (iot.naturela-bg.com) uses them. No own names or translations.
+
+| Code | Label |
+|---|---|
+| 0 | Standby |
+| 1 | Clearing |
+| 2 | Charging |
+| 3 | Firing |
+| 4 | Burning |
+| 5 | Keeping |
+| 6 | Power1 |
+| 7 | Power2 |
+| 8 | Power3 |
+| 9 | Clearing2 |
+| 10 | StopFiring |
+
+Observed on a BurnerTouch: start `Clearing → Charging → Firing → Burning → Power3`, stop `StopFiring → Clearing → Standby`. Unknown codes show as `Unknown` and are logged once as a warning.
 
 ---
 
@@ -108,6 +149,8 @@ During setup you will be asked for:
 
 A custom Lovelace card is available: [`naturela-pellet-card.js`](www/naturela-pellet-card.js).
 
+Since card v34 the card has a collapsible **Timer** section (delay, burn duration, start / cancel). It finds the timer entities automatically on the same device as `climate_entity` (integration v1.4.1 or newer). While the stove is burning it only offers "turn off in"; while a timer is planned it shows the planned moments and a cancel button. Labels follow the HA language (Dutch or English).
+
 **Installation:**
 
 1. Copy `naturela-pellet-card.js` to `/config/www/` in Home Assistant
@@ -129,14 +172,14 @@ alarm_sensor: sensor.pellet_stove_alarm
 **Example view:**
 ```
 ┌─────────────────────────────────────────┐
-│ 🔥 Pellet Stove          Stand-by       │
+│ 🔥 Pellet Stove          Standby        │
 │ Boiler: 42 °C            Target 60°C   │
 │         [ On  ]  [████  OFF  ████]      │
 ├──────────────┬──────────────┬──────────┤
 │    FLUE      │    POWER     │   PUMP   │
 │   31 °C      │   17.9 kW   │  Active  │
 ├──────────────┴──────────────┴──────────┤
-│ STATUS: Stand-by                        │
+│ STATUS: Standby                         │
 └─────────────────────────────────────────┘
 ```
 
@@ -156,6 +199,21 @@ The integration detects start-up via the `_command_pending` flag: as long as the
 ## Changelog
 
 ### Integration
+
+#### v1.4.2 (2026-10-30)
+- Status sensor now uses the literal Naturela `BurnStatus` labels (Standby, Clearing, Charging, Firing, Burning, Keeping, Power1/2/3, Clearing2, StopFiring). Previous labels were partly wrong (e.g. code 3 *Firing* was shown as "Cool down").
+- Power1/2/3 are direct status codes 6/7/8; the derivation from `FPower` thresholds is removed
+- **Breaking:** automations or templates that compare the status sensor with old labels (e.g. `Stand-by`, `Cool down`) must use the new labels
+
+#### v1.4.1 (2026-10-30)
+- Delay (`number`) and *Start timer* (`button`): turn on after a delay, off after the burn duration
+- New service `start_timer` (`delay`, `duration`)
+
+#### v1.4.0 (2026-10-30)
+- Timer and schedule: turn off in X hours, burn for X hours, turn on/off at a set date and time
+- New entities: burn duration (`number`), three `button`s, two `datetime`s and two timestamp `sensor`s
+- New services: `turn_off_in`, `turn_on_for`, `turn_on_at`, `turn_off_at`, `cancel_schedule`
+- Schedule persisted across restarts; Dutch and English translations
 
 #### v1.3.1 (2026-05-18)
 - Full English translation: README, sensor friendly names, binary sensor names, `strings.json`
@@ -192,6 +250,13 @@ The integration detects start-up via the `_command_pending` flag: as long as the
 - Initial release: climate entity, sensors, binary sensors, config flow UI, Lovelace custom card, 60+ language translations
 
 ### Card
+
+#### v38 (2026-10-30)
+- Status shown as the literal label from the status sensor; colour by phase
+
+#### v34 to v37 (2026-10-30)
+- Collapsible Timer section with delay and burn duration steppers, start, turn off in, cancel
+- Context aware: burning stove shows "turn off in", planned timer shows the planned moments
 
 #### v11 (2026-04-01)
 - Static header colour (no longer dependent on status colour)

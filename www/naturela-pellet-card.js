@@ -14,26 +14,17 @@ const STATUS_COLORS = {
 const HEADER_COLOR = '#1976D2';
 
 function getStatusInfo(raw) {
-  const num = parseInt(raw, 10);
-  if (!isNaN(num) && STATUS_COLORS[num]) return STATUS_COLORS[num];
-
-  const s = (raw || '').toLowerCase();
-  if (s.includes('stand') || s === 'stand-by')
-    return STATUS_COLORS[0];
-  if (s.includes('fault') || s.includes('error') || s.includes('alarm'))
-    return { bg: STATUS_COLORS[4].bg, text: STATUS_COLORS[4].text, name: raw };
-  if (s.includes('ignit') || s.includes('firing') || s.includes('clean'))
-    return STATUS_COLORS[1];
-  // power1..power5 → show the power level
-  const powerMatch = raw.match(/^[Pp]ower\s*(\d+)$/);
-  if (powerMatch)
-    return { bg: STATUS_COLORS[2].bg, text: STATUS_COLORS[2].text, name: 'Power ' + powerMatch[1] };
-  if (s.includes('burn') || s.includes('power') || s.includes('keeping'))
-    return STATUS_COLORS[2];
-  if (s.includes('suspend') || s.includes('wait'))
-    return STATUS_COLORS[5];
-  if (s.includes('cool'))
-    return STATUS_COLORS[7];
+  // v38: status sensor delivers the literal Naturela BurnStatus labels.
+  // Colour by phase; the shown name is always the label as-is.
+  const s = String(raw || '').toLowerCase();
+  const C = i => ({ bg: STATUS_COLORS[i].bg, text: STATUS_COLORS[i].text, name: raw || 'Unknown' });
+  if (s.includes('stand')) return C(0);
+  if (s.includes('fault') || s.includes('error') || s.includes('alarm') || s.includes('fail')
+      || s.includes('no pellets') || s.includes('overheat')) return C(4);
+  if (s === 'stopfiring') return C(7);
+  if (s.startsWith('clearing') || s === 'charging' || s === 'firing') return C(1);
+  if (s === 'keeping') return C(5);
+  if (s === 'burning' || /^power\s*\d+$/.test(s)) return C(2);
   return { bg: HEADER_COLOR, text: '#fff', name: raw || 'Unknown' };
 }
 
@@ -46,8 +37,6 @@ class NaturelaPelletCard extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    // Do NOT clear _pendingTemp here — HA polls stale device data and would
-    // reset the baseline mid-session. Timeout in _adjustTemp handles cleanup.
     this._render();
   }
 
@@ -64,15 +53,12 @@ class NaturelaPelletCard extends HTMLElement {
     const max  = climate.attributes.max_temp || 90;
     const step = climate.attributes.target_temp_step || 1;
 
-    // Use pending temp as baseline so rapid clicks stack correctly.
-    // Never use HA state here — it may reflect a stale poll, not the last press.
     const haTemp  = parseFloat(climate.attributes.temperature) || 0;
     const current = this._pendingTemp !== undefined ? this._pendingTemp : haTemp;
     const newTemp = Math.min(max, Math.max(min, current + delta * step));
     if (newTemp === current) return;
 
     this._pendingTemp = newTemp;
-    // Reset 8-second idle timer — clears _pendingTemp after user stops pressing
     if (this._pendingTimer) clearTimeout(this._pendingTimer);
     this._pendingTimer = setTimeout(() => {
       this._pendingTemp  = undefined;
@@ -84,7 +70,7 @@ class NaturelaPelletCard extends HTMLElement {
       entity_id: this._config.climate_entity,
       temperature: newTemp,
     });
-    this._render(); // update display immediately, don't wait for HA push
+    this._render();
   }
 
   _render() {
@@ -122,7 +108,6 @@ class NaturelaPelletCard extends HTMLElement {
 
     const statusRaw = statusS?.state ?? 'Unknown';
 
-    // Derive power label from status when no power_sensor configured
     const powerFromStatus = (() => {
       const pm = statusRaw.match(/^[Pp]ower\s*(\d+)$/);
       if (pm) return 'P' + pm[1];
@@ -136,9 +121,11 @@ class NaturelaPelletCard extends HTMLElement {
 
     const si       = getStatusInfo(statusRaw);
     const statusName = si.name;
+    // v33: headerBg and headerText now use theme variables when stove is off
     const headerBg   = isOn ? (si.bg || HEADER_COLOR) : 'var(--secondary-background-color, #37474F)';
     const headerText = isOn ? '#fff' : 'var(--primary-text-color, #e0e0e0)';
     const title      = cfg.title || 'Pellet Stove';
+    const tm         = this._timerModel(climate);
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -238,6 +225,26 @@ class NaturelaPelletCard extends HTMLElement {
           color: var(--secondary-text-color, #9e9e9e); text-transform: uppercase; margin-bottom: 3px;
         }
         .status-footer-value { font-size: 1em; font-weight: 500; color: ${si.bg}; }
+        .timer-head {
+          display: flex; align-items: center; gap: 8px; width: 100%;
+          border: none; background: transparent; cursor: pointer;
+          padding: 10px 16px; font: inherit; text-align: left;
+          border-top: 1px solid var(--divider-color, #e0e0e0);
+          color: var(--primary-text-color, #212121);
+        }
+        .timer-head-label { font-size: 0.65em; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--secondary-text-color, #9e9e9e); }
+        .timer-head-sum { flex: 1; text-align: right; font-size: 0.85em; color: ${tm.planned ? HEADER_COLOR : 'var(--secondary-text-color, #9e9e9e)'}; font-weight: ${tm.planned ? 600 : 400}; }
+        .timer-chev { font-size: 0.8em; color: var(--secondary-text-color, #9e9e9e); transition: transform .15s; }
+        .timer-chev.open { transform: rotate(180deg); }
+        .timer-body { padding: 0 16px 12px; display: flex; flex-direction: column; gap: 8px; }
+        .timer-row { display: flex; align-items: center; gap: 8px; background: var(--secondary-background-color, #f5f5f5); border-radius: 8px; padding: 8px 12px; }
+        .timer-row-label { flex: 1; font-size: 0.85em; color: var(--primary-text-color, #212121); }
+        .timer-row-label small { display: block; font-size: 0.8em; color: var(--secondary-text-color, #9e9e9e); }
+        .timer-val { min-width: 56px; text-align: center; font-weight: 600; color: var(--primary-text-color, #212121); }
+        .timer-btns { display: flex; gap: 8px; }
+        .timer-btns .action-btn { padding: 9px 0; }
+        .btn-start { background: ${HEADER_COLOR}; color: #fff; }
+        .btn-sec { background: var(--secondary-background-color, #e0e0e0); color: var(--primary-text-color, #424242); }
       </style>
       <div class="card">
         <div class="header">
@@ -281,6 +288,7 @@ class NaturelaPelletCard extends HTMLElement {
             <div class="info-tile-value">${pumpLabel}</div>
           </div>
         </div>
+        ${tm.available ? this._timerHtml(tm) : ''}
         <div class="status-footer">
           <div class="status-footer-label">Status</div>
           <div class="status-footer-value">${statusName}</div>
@@ -304,6 +312,166 @@ class NaturelaPelletCard extends HTMLElement {
     });
     this.shadowRoot.getElementById('tempDown').addEventListener('click', () => this._adjustTemp(-1));
     this.shadowRoot.getElementById('tempUp').addEventListener('click',   () => this._adjustTemp(1));
+    if (tm.available) this._bindTimer(tm);
+  }
+
+  // ---- v34: timer section ------------------------------------------------
+  // Entities are found automatically on the same device as climate_entity
+  // (naturela_smarthome >= 1.4.1), or set explicitly in the card config:
+  // delay_entity, duration_entity, start_entity, off_after_entity,
+  // cancel_entity, next_on_entity, next_off_entity.
+  _timerEntity(cfgKey, translationKey, climate) {
+    if (this._config[cfgKey]) return this._config[cfgKey];
+    const reg = this._hass.entities || {};
+    const dev = climate && reg[climate.entity_id] ? reg[climate.entity_id].device_id : null;
+    if (!dev) return null;
+    const hit = Object.values(reg).find(e => e.device_id === dev
+      && e.platform === 'naturela_smarthome' && e.translation_key === translationKey);
+    return hit ? hit.entity_id : null;
+  }
+
+  _timerModel(climate) {
+    const id = {
+      delay:    this._timerEntity('delay_entity', 'delay', climate),
+      duration: this._timerEntity('duration_entity', 'burn_duration', climate),
+      start:    this._timerEntity('start_entity', 'start_timer', climate),
+      offAfter: this._timerEntity('off_after_entity', 'off_after_duration', climate),
+      cancel:   this._timerEntity('cancel_entity', 'cancel_schedule', climate),
+      nextOn:   this._timerEntity('next_on_entity', 'next_on', climate),
+      nextOff:  this._timerEntity('next_off_entity', 'next_off', climate),
+    };
+    const ts = e => { const s = this._s(e); if (!s) return null; const d = new Date(s.state); return isNaN(d) ? null : d; };
+    const num = e => { const s = this._s(e); const v = s ? parseFloat(s.state) : NaN; return isNaN(v) ? null : v; };
+    const nextOn = ts(id.nextOn), nextOff = ts(id.nextOff);
+    return {
+      id,
+      available: !!(id.delay && id.duration && id.start && id.cancel),
+      delay: this._pendingDelay ?? num(id.delay),
+      duration: this._pendingDuration ?? num(id.duration),
+      nextOn, nextOff,
+      planned: !!(nextOn || nextOff),
+      isOn: climate?.state === 'heat',
+    };
+  }
+
+  _t(key) {
+    const nl = (this._hass?.language || '').startsWith('nl');
+    const T = {
+      timer:   ['Timer', 'Timer'],
+      off:     ['Not active', 'Niet actief'],
+      delay:   ['Delay', 'Voorlooptijd'],
+      delayS:  ['turn on in', 'aan over'],
+      dur:     ['Burn duration', 'Nalooptijd'],
+      durS:    ['then off after', 'daarna uit na'],
+      durOn:   ['turn off in', 'uit over'],
+      offIn:   ['Turn off in', 'Uit over'],
+      willOn:  ['Turns on at', 'Gaat aan om'],
+      willOff: ['Turns off at', 'Gaat uit om'],
+      cancelT: ['Cancel timer', 'Timer annuleren'],
+      start:   ['Start timer', 'Start timer'],
+      offAft:  ['Off after duration', 'Uit na nalooptijd'],
+      cancel:  ['Cancel', 'Annuleren'],
+      on:      ['On', 'Aan'],
+      offW:    ['Off', 'Uit'],
+      now:     ['now', 'nu'],
+    };
+    return (T[key] || [key, key])[nl ? 1 : 0];
+  }
+
+  _fmtTime(d) {
+    if (!d) return '';
+    const lang = this._hass?.language || undefined;
+    const t = d.toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' });
+    const today = new Date();
+    if (d.toDateString() === today.toDateString()) return t;
+    return d.toLocaleDateString(lang, { weekday: 'short' }) + ' ' + t;
+  }
+
+  _fmtHours(h) {
+    if (h === null || h === undefined) return '-';
+    if (h === 0) return this._t('now');
+    const hh = Math.floor(h), mm = Math.round((h - hh) * 60);
+    return mm ? `${hh}:${String(mm).padStart(2, '0')} u` : `${hh} u`;
+  }
+
+  _timerSummary(tm) {
+    const parts = [];
+    if (tm.nextOn)  parts.push(this._t('on') + ' ' + this._fmtTime(tm.nextOn));
+    if (tm.nextOff) parts.push(this._t('offW') + ' ' + this._fmtTime(tm.nextOff));
+    return parts.length ? parts.join(' · ') : this._t('off');
+  }
+
+  _timerHtml(tm) {
+    const open = !!this._timerOpen;
+    const planRow = (label, d) => d ? `<div class="timer-row">
+          <div class="timer-row-label">${label}</div>
+          <div class="timer-val">${this._fmtTime(d)}</div>
+        </div>` : '';
+    const plannedBody = `
+      <div class="timer-body">
+        ${planRow(this._t('willOn'), tm.nextOn)}
+        ${planRow(this._t('willOff'), tm.nextOff)}
+        <div class="timer-btns">
+          <button class="action-btn btn-sec" id="tCancel">${this._t('cancelT')}</button>
+        </div>
+      </div>`;
+    const setupBody = `
+      <div class="timer-body">
+        ${tm.isOn ? '' : `<div class="timer-row">
+          <div class="timer-row-label">${this._t('delay')}<small>${this._t('delayS')}</small></div>
+          <button class="ctrl-btn" id="tDelayDown">&#8722;</button>
+          <div class="timer-val">${this._fmtHours(tm.delay)}</div>
+          <button class="ctrl-btn" id="tDelayUp">&#43;</button>
+        </div>`}
+        <div class="timer-row">
+          <div class="timer-row-label">${this._t('dur')}<small>${this._t(tm.isOn ? 'durOn' : 'durS')}</small></div>
+          <button class="ctrl-btn" id="tDurDown">&#8722;</button>
+          <div class="timer-val">${this._fmtHours(tm.duration)}</div>
+          <button class="ctrl-btn" id="tDurUp">&#43;</button>
+        </div>
+        <div class="timer-btns">
+          ${tm.isOn
+            ? (tm.id.offAfter ? `<button class="action-btn btn-start" id="tOffAfter">&#9201; ${this._t('offIn')} ${this._fmtHours(tm.duration)}</button>` : '')
+            : `<button class="action-btn btn-start" id="tStart">&#9201; ${this._t('start')}</button>`}
+        </div>
+      </div>`;
+    const body = !open ? '' : (tm.planned ? plannedBody : setupBody);
+    return `
+      <button class="timer-head" id="tHead">
+        <span>&#9201;</span>
+        <span class="timer-head-label">${this._t('timer')}</span>
+        <span class="timer-head-sum">${this._timerSummary(tm)}</span>
+        <span class="timer-chev ${open ? 'open' : ''}">&#9660;</span>
+      </button>${body}`;
+  }
+
+  _stepNumber(entityId, pendingKey, dir) {
+    const s = this._s(entityId);
+    if (!s) return;
+    const a = s.attributes;
+    const step = a.step || 0.5, min = a.min ?? 0, max = a.max ?? 24;
+    const cur = this[pendingKey] ?? parseFloat(s.state);
+    const next = Math.min(max, Math.max(min, Math.round((cur + dir * step) / step) * step));
+    if (next === cur) return;
+    this[pendingKey] = next;
+    clearTimeout(this[pendingKey + 'T']);
+    this[pendingKey + 'T'] = setTimeout(() => { this[pendingKey] = undefined; this._render(); }, 4000);
+    this._hass.callService('number', 'set_value', { entity_id: entityId, value: next });
+    this._render();
+  }
+
+  _bindTimer(tm) {
+    const $ = id => this.shadowRoot.getElementById(id);
+    const press = e => this._hass.callService('button', 'press', { entity_id: e });
+    $('tHead').addEventListener('click', () => { this._timerOpen = !this._timerOpen; this._render(); });
+    if (!this._timerOpen) return;
+    if ($('tDelayDown')) $('tDelayDown').addEventListener('click', () => this._stepNumber(tm.id.delay, '_pendingDelay', -1));
+    if ($('tDelayUp'))   $('tDelayUp').addEventListener('click',   () => this._stepNumber(tm.id.delay, '_pendingDelay', 1));
+    if ($('tDurDown')) $('tDurDown').addEventListener('click', () => this._stepNumber(tm.id.duration, '_pendingDuration', -1));
+    if ($('tDurUp'))   $('tDurUp').addEventListener('click',   () => this._stepNumber(tm.id.duration, '_pendingDuration', 1));
+    if ($('tStart')) $('tStart').addEventListener('click', () => press(tm.id.start));
+    if ($('tOffAfter')) $('tOffAfter').addEventListener('click', () => press(tm.id.offAfter));
+    if ($('tCancel'))   $('tCancel').addEventListener('click',   () => press(tm.id.cancel));
   }
 
   getCardSize() { return 7; }

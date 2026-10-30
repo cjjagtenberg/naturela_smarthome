@@ -8,6 +8,16 @@ CONF_SCAN_INTERVAL = "scan_interval"
 CONF_CONTROLLER_TYPE = "controller_type"
 DEFAULT_SCAN_INTERVAL = 30  # seconds
 
+# Timer / schedule (v1.4.0)
+DEFAULT_BURN_DURATION_HOURS = 2.0
+MIN_BURN_DURATION_HOURS = 0.5
+MAX_BURN_DURATION_HOURS = 12.0
+BURN_DURATION_STEP_HOURS = 0.5
+DEFAULT_DELAY_HOURS = 0.0
+MIN_DELAY_HOURS = 0.0
+MAX_DELAY_HOURS = 24.0
+DELAY_STEP_HOURS = 0.25
+
 # Controller types — corresponds to the endpoint segment used in
 # iot.naturela-bg.com/api/{controller_type} and the URL shown in the
 # Naturela web UI (/#/device/{controller_type}/<id>).
@@ -53,35 +63,32 @@ API_URL, SET_STATE_URL, SET_TEMP_URL = build_api_urls(DEFAULT_CONTROLLER)
 STATE_OFF = 0
 STATE_ON  = 128
 
-# Status code labels.
-# These match LITERALLY what the Naturela controller and iot.naturela-bg.com
-# web portal display (confirmed by live observation 2026-04-26).
-# Keys can be numeric codes (int) or text strings from the controller.
-#
-# Note on Status 1: covers three sub-phases on the controller
-# ("Cleaning" -> "Feeding" -> "Ignition") that are not exposed as separate
-# API codes. Generic label "Cleaning" is used; for shutdown context the
-# same code 1 also represents "Cleaning on stop" (~40s blow-out).
+# Status code labels (v1.4.2).
+# Literal BurnStatus enum from the Naturela cloud frontend
+# (https://iot.naturela-bg.com/scripts/applicationbundle.js, pattern
+# `BurnStatus[BurnStatus["LABEL"] = N] = "LABEL";`, captured 2026-05-14).
+# No own names or translations: HA shows exactly what Naturela shows.
+# Observed start sequence: 1 -> 2 -> 3 -> 4 -> 8; stop: 10 -> 1 -> 0.
 STATUS_NAMES = {
-    # Numeric codes
-    0:  "Stand-by",
-    1:  "Cleaning",   # Cleaning + Feeding + Ignition (start) OR Cleaning on stop
-    2:  "Burning",    # rare; sensor.py overrides to Power1/2/3 when FPower set
-    3:  "Cool down",  # observed in historical logs
-    4:  "Unfolding fire",  # flame build-up after ignition (flue gas +5 degrees C trigger)
-    5:  "Suspend",    # PS modulation - water at temperature
-    6:  "Suspend",    # entering Suspend (P1 modulation just before)
-    7:  "Burning shutdown",  # P3 -> P2 -> P1 ramp (60s each), observed historical
-    8:  "Burning",    # main burning state; sensor.py overrides to Power1/2/3
-    10: "Cool down",  # observed in historical logs
+    0:  "Standby",
+    1:  "Clearing",
+    2:  "Charging",
+    3:  "Firing",
+    4:  "Burning",
+    5:  "Keeping",
+    6:  "Power1",
+    7:  "Power2",
+    8:  "Power3",
+    9:  "Clearing2",
+    10: "StopFiring",
     # Text values returned as strings by some firmware versions
-    "Stand by":     "Stand-by",
-    "keeping":      "Extinguishing",
-    "Firing":       "Cleaning",
-    "see display":  "See display",
+    "Stand by":      "Standby",
+    "keeping":       "Keeping",
+    "Firing":        "Firing",
+    "see display":   "See display",
     "Ignition Fail": "Ignition fail",
-    # Error / alarm states (best-guess mappings -- verified labels will be
-    # captured via the WARNING log in sensor.py the first time they occur).
+    # Error / alarm states (not part of the BurnStatus enum; labels are
+    # best-guess and get logged with a WARNING the first time they occur).
     "No pellets":      "No pellets",
     "No Pellets":      "No pellets",
     "No fuel":         "No pellets",
@@ -97,25 +104,23 @@ STATUS_NAMES = {
     "OverTemp":        "Overheating",
 }
 
-# Status codes considered "burning" -- sensor.py derives Power1/2/3 from FPower
-# vs Power1/Power2/Power3 thresholds for these codes.
-BURNING_STATUS_CODES = {2, 8}
+# Power1/2/3 are direct status codes (6/7/8); no derivation from FPower.
+# Kept (empty) for backwards compatibility of imports.
+BURNING_STATUS_CODES: set = set()
 
-# All possible status labels -- used as `options` for the ENUM device class
-# on the status sensor so that HA's history graph + logbook render nicely.
+# All possible status labels, used as `options` for the ENUM status sensor.
 STATUS_OPTIONS = [
-    "Stand-by",
-    "Cleaning",
-    "Unfolding fire",
+    "Standby",
+    "Clearing",
+    "Charging",
+    "Firing",
     "Burning",
-    "PS",          # Keeping - FPower below P1 threshold
+    "Keeping",
     "Power1",
     "Power2",
     "Power3",
-    "Suspend",
-    "Burning shutdown",
-    "Cool down",
-    "Extinguishing",
+    "Clearing2",
+    "StopFiring",
     "See display",
     "Ignition fail",
     "No pellets",

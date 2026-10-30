@@ -12,6 +12,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import NaturelaAPI, NaturelaAuthError, NaturelaConnectionError
+from .scheduler import NaturelaScheduler
 from .const import (
     CONF_CONTROLLER_TYPE,
     CONF_DEVICE_ID,
@@ -23,7 +24,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["climate", "sensor", "binary_sensor"]
+PLATFORMS = ["climate", "sensor", "binary_sensor", "number", "button", "datetime"]
 
 
 @dataclass
@@ -32,6 +33,7 @@ class NaturelaRuntimeData:
 
     coordinator: DataUpdateCoordinator
     api: NaturelaAPI
+    scheduler: NaturelaScheduler
 
 
 NaturelaConfigEntry: TypeAlias = "ConfigEntry[NaturelaRuntimeData]"
@@ -80,19 +82,31 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await coordinator.async_config_entry_first_refresh()
 
+    scheduler = NaturelaScheduler(hass, entry.entry_id)
+    await scheduler.async_load()
+    entry.async_on_unload(scheduler.async_unload)
+
     # Support both legacy hass.data pattern (climate.py, binary_sensor.py)
     # and modern entry.runtime_data pattern (sensor.py)
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         "coordinator": coordinator,
         "api": api,
+        "scheduler": scheduler,
     }
-    entry.runtime_data = NaturelaRuntimeData(coordinator=coordinator, api=api)
+    entry.runtime_data = NaturelaRuntimeData(
+        coordinator=coordinator, api=api, scheduler=scheduler
+    )
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     entry.async_on_unload(api.close)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Remove the persisted schedule when the integration entry is deleted."""
+    await NaturelaScheduler(hass, entry.entry_id)._store.async_remove()
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

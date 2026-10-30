@@ -18,7 +18,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
-    BURNING_STATUS_CODES,
     CONF_DEVICE_ID,
     DOMAIN,
     MANUFACTURER,
@@ -26,6 +25,8 @@ from .const import (
     STATUS_NAMES,
     STATUS_OPTIONS,
 )
+
+from .schedule_entity import NaturelaScheduleEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -215,6 +216,11 @@ async def async_setup_entry(
         NaturelaSensor(coordinator, device_id, desc)
         for desc in SENSORS
     ]
+    scheduler = entry.runtime_data.scheduler
+    entities += [
+        NaturelaScheduleSensor(entry, scheduler, "next_on", "mdi:calendar-clock"),
+        NaturelaScheduleSensor(entry, scheduler, "next_off", "mdi:calendar-remove"),
+    ]
     async_add_entities(entities)
 
 
@@ -238,11 +244,9 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
     Returns one of the labels in STATUS_OPTIONS (ENUM device class) so HA's
     history graph and logbook render nicely with colored bars per state.
 
-    Mapping logic:
-    - When status code is in BURNING_STATUS_CODES (2 or 8), derive power label
-      from FPower vs Power1/Power2/Power3 thresholds reported by the API
-      → returns "Power1" / "Power2" / "Power3" / "PS".
-    - Otherwise look up STATUS_NAMES (numeric or string key).
+    Mapping logic (v1.4.2):
+    - Look up STATUS_NAMES (numeric or string key): the literal Naturela
+      BurnStatus labels, Power1/2/3 included as direct codes 6/7/8.
     - Unknown codes return "Unknown" rather than raising or polluting history
       with arbitrary values.
     """
@@ -265,24 +269,6 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
         value = d.get("Status")
         if value is None:
             return None
-
-        # Burning state → derive power-level label from FPower vs thresholds.
-        # Matches what the Naturela controller and web portal display.
-        if value in BURNING_STATUS_CODES:
-            fpower = d.get("FPower") or 0
-            p3 = d.get("Power3")
-            p2 = d.get("Power2")
-            p1 = d.get("Power1")
-            if p3 is not None and fpower >= p3:
-                return "Power3"
-            if p2 is not None and fpower >= p2:
-                return "Power2"
-            if p1 is not None and fpower >= p1:
-                return "Power1"
-            # FPower below P1 threshold but burning → PS (Keeping)
-            if fpower > 0:
-                return "PS"
-            # FPower=0 yet status burning → transitional, fall through to STATUS_NAMES
 
         label = STATUS_NAMES.get(value)
         if label is None:
@@ -398,3 +384,23 @@ class NaturelaSensor(_NaturelaEntityBase, SensorEntity):
             except (TypeError, ValueError):
                 return value
         return value
+
+
+# ----------------------------------------------------------------------
+# Timer / schedule sensors (v1.4.0)
+# ----------------------------------------------------------------------
+
+
+class NaturelaScheduleSensor(NaturelaScheduleEntity, SensorEntity):
+    """Next scheduled on / off moment as a timestamp sensor."""
+
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(self, entry, scheduler, key: str, icon: str) -> None:
+        super().__init__(entry, scheduler, key)
+        self._attr_icon = icon
+        self._is_on = key == "next_on"
+
+    @property
+    def native_value(self):
+        return self._scheduler.on_at if self._is_on else self._scheduler.off_at
