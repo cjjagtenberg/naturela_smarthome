@@ -19,6 +19,7 @@ from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from .verify import CommandVerifier
 from .const import CONF_DEVICE_ID, DOMAIN, MANUFACTURER, MODEL, STATE_OFF, STATE_ON, STATUS_NAMES
 
 _LOGGER = logging.getLogger(__name__)
@@ -134,6 +135,11 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         super().__init__(coordinator)
         self._api = api
         self._scheduler = scheduler
+        self._verifier = CommandVerifier(
+            coordinator.hass, api, coordinator,
+            lambda: self.entity_id,
+            lambda: self.async_write_ha_state() if self.hass else None,
+        )
         self._device_id = device_id
         self._command_pending = False  # True while waiting for stove to start
         self._attr_unique_id = f"{DOMAIN}_{device_id}_climate"
@@ -154,6 +160,7 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         self.async_on_remove(
             self._scheduler.async_add_listener(self.async_write_ha_state)
         )
+        self.async_on_remove(self._verifier.cancel)
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -229,6 +236,8 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
             "status_name": STATUS_NAMES.get(d.get("Status", 0), f"Status {d.get('Status')}"),
             "scheduled_on": self._scheduler.on_at.isoformat() if self._scheduler.on_at else None,
             "scheduled_off": self._scheduler.off_at.isoformat() if self._scheduler.off_at else None,
+            "command_check": self._verifier.state,
+            "last_command": self._api.last_command,
         }
 
     # ------------------------------------------------------------------
@@ -259,6 +268,8 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         state = STATE_ON if hvac_mode == HVACMode.HEAT else STATE_OFF
         try:
             success = await self._api.set_state(state)
+            if success:
+                self._verifier.start(hvac_mode == HVACMode.HEAT)
             if not success:
                 _LOGGER.error("Failed to set HVAC mode to %s", hvac_mode)
                 self._command_pending = False

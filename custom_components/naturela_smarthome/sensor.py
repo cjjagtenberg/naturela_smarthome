@@ -260,6 +260,28 @@ class NaturelaStatusSensor(_NaturelaEntityBase, SensorEntity):
         super().__init__(coordinator, device_id)
         self._attr_unique_id = f"{DOMAIN}_{device_id}_status"
         self._attr_name = "Status"
+        self._trail: list[str] = []
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        """Last distinct status labels, oldest first (v1.4.3).
+
+        Lets automations tell a normal shutdown (... StopFiring, Clearing,
+        Standby) from a failed ignition (... Firing, Clearing, Standby).
+        """
+        return {"status_trail": list(self._trail)}
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        label = self.native_value
+        if label is not None:
+            self._trail = [label]
+
+    def _handle_coordinator_update(self) -> None:
+        label = self.native_value
+        if label is not None and (not self._trail or self._trail[-1] != label):
+            self._trail = (self._trail + [label])[-6:]
+        super()._handle_coordinator_update()
 
     @property
     def native_value(self) -> str | None:

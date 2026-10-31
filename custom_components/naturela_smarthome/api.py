@@ -40,6 +40,8 @@ class NaturelaAPI:
         self._device_serial: str | None = None  # populated from DeviceID in API response
         self._session: aiohttp.ClientSession | None = None
         self._logged_in = False
+        # Last on/off/temperature command and the cloud's answer (v1.4.3)
+        self.last_command: dict | None = None
 
     async def _get_session(self) -> aiohttp.ClientSession:
         """Return or create an aiohttp session."""
@@ -156,6 +158,25 @@ class NaturelaAPI:
             url=self._set_temp_url,
         )
 
+    async def force_relogin(self) -> None:
+        """Drop the session state so the next call logs in again."""
+        self._logged_in = False
+        try:
+            await self.login()
+        except Exception as exc:  # noqa: BLE001
+            _LOGGER.warning("Re-login before retry failed: %s", exc)
+
+    def _record(self, payload: dict, status: int, body: str, relogin: bool) -> None:
+        from homeassistant.util import dt as dt_util
+        self.last_command = {
+            "time": dt_util.utcnow().isoformat(),
+            "payload": {k: v for k, v in payload.items() if k != "deviceId"},
+            "http": status,
+            "response": (body or "")[:200],
+            "relogin": relogin,
+        }
+        _LOGGER.debug("Command result: %s", self.last_command)
+
     async def _post_command(self, payload: dict, url: str | None = None) -> bool:
         """POST a command; re-login once if the session has expired."""
         if not self._logged_in:
@@ -187,6 +208,7 @@ class NaturelaAPI:
                     self._logged_in = False
                     await self.login()
                     async with _do_post() as resp2:
+                        self._record(payload, resp2.status, await resp2.text(), True)
                         success = resp2.status == 200
                         if not success:
                             _LOGGER.error(
@@ -194,6 +216,7 @@ class NaturelaAPI:
                                 resp2.status, payload,
                             )
                         return success
+                self._record(payload, resp.status, await resp.text(), False)
                 success = resp.status == 200
                 if not success:
                     _LOGGER.error(

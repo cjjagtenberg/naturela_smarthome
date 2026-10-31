@@ -87,6 +87,21 @@ data:
 - Turning the stove off via HA cancels a pending turn-off, unless a turn-on is still planned.
 - Times without a time zone are interpreted in HA's configured time zone.
 
+### Command verification (v1.4.3)
+
+Every on/off command sent from Home Assistant is checked against the stove's status for 3 minutes. An ignored turn-off is re-sent (fresh login, max. 2 retries). When a command is not followed, the event `naturela_smarthome_command_failed` is fired, for example to send a push notification:
+
+```yaml
+triggers:
+  - trigger: event
+    event_type: naturela_smarthome_command_failed
+actions:
+  - action: notify.mobile_app_your_phone
+    data:
+      title: Pellet stove does not respond
+      message: "Turn-{{ trigger.event.data.command }} not followed, status {{ trigger.event.data.status }}"
+```
+
 ### Status codes
 
 The status sensor shows the literal labels of the Naturela `BurnStatus` enum, exactly as the Naturela web portal (iot.naturela-bg.com) uses them. No own names or translations.
@@ -199,6 +214,13 @@ The integration detects start-up via the `_command_pending` flag: as long as the
 ## Changelog
 
 ### Integration
+
+#### v1.4.3 (2026-10-31)
+- Command verification: after every on/off command from HA the integration checks that the stove follows it within 3 minutes (off: StopFiring, Clearing or Standby; on: leaves Standby)
+- A turn-off that the stove ignores is re-sent with a fresh login, up to 2 times; a turn-on is never re-sent automatically
+- If a command is not followed: event `naturela_smarthome_command_failed` (`entity_id`, `command`, `status`, `attempts`) and a persistent notification
+- Climate attributes `command_check` and `last_command` (time, HTTP status and cloud response of the last command)
+- Status sensor attribute `status_trail` (last distinct labels), e.g. to tell a normal shutdown from a failed ignition
 
 #### v1.4.2 (2026-10-30)
 - Status sensor now uses the literal Naturela `BurnStatus` labels (Standby, Clearing, Charging, Firing, Burning, Keeping, Power1/2/3, Clearing2, StopFiring). Previous labels were partly wrong (e.g. code 3 *Firing* was shown as "Cool down").
