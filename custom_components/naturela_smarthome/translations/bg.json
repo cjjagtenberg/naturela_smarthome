@@ -21,5 +21,17 @@
     "abort": {
       "already_configured": "Това устройство вече е konfigurirano"
     }
+  },
+  "entity": {
+    "select": {
+      "operating_mode": {
+        "name": "Режим на работа",
+        "state": {
+          "off": "Изкл.",
+          "on": "Вкл.",
+          "timers": "Таймери"
+        }
+      }
+    }
   }
 }

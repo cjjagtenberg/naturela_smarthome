@@ -60,6 +60,16 @@
       "next_off": {
         "name": "Gepland uit"
       }
+    },
+    "select": {
+      "operating_mode": {
+        "name": "Bedrijfsmodus",
+        "state": {
+          "off": "Uit",
+          "on": "Aan",
+          "timers": "Timers"
+        }
+      }
     }
   },
   "services": {

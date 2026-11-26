@@ -63,6 +63,42 @@ API_URL, SET_STATE_URL, SET_TEMP_URL = build_api_urls(DEFAULT_CONTROLLER)
 STATE_OFF = 0
 STATE_ON  = 128
 
+# Operating mode (v1.5.0).
+# The "State" byte packs two fields, as decoded by the Naturela web UI
+# (applicationbundle.js, BurnerStatus / BurnerTouchStatus):
+#   onOffState = (State >> 6) & 3   -> 0 = OFF, 2 = ON, 3 = Timers
+#   fuelState  =  State       & 3   -> fuel selection, must be preserved
+# The web UI writes it back as (onOffState << 6) | fuelState.
+MODE_OFF = 0
+MODE_ON = 2
+MODE_TIMERS = 3
+MODE_SHIFT = 6
+MODE_MASK = 0b11
+FUEL_MASK = 0b11
+
+MODE_OPTIONS = {
+    "off": MODE_OFF,
+    "on": MODE_ON,
+    "timers": MODE_TIMERS,
+}
+
+
+def get_mode(state) -> int:
+    """Return the onOffState field of a raw State value (0 if unknown)."""
+    try:
+        return (int(state) >> MODE_SHIFT) & MODE_MASK
+    except (TypeError, ValueError):
+        return MODE_OFF
+
+
+def build_state(mode: int, current_state=0) -> int:
+    """Compose a State value for setState, keeping the current fuel bits."""
+    try:
+        fuel = int(current_state) & FUEL_MASK
+    except (TypeError, ValueError):
+        fuel = 0
+    return ((mode & MODE_MASK) << MODE_SHIFT) | fuel
+
 # Status code labels (v1.4.2).
 # Literal BurnStatus enum from the Naturela cloud frontend
 # (https://iot.naturela-bg.com/scripts/applicationbundle.js, pattern

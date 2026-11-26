@@ -60,6 +60,16 @@
       "next_off": {
         "name": "Scheduled off"
       }
+    },
+    "select": {
+      "operating_mode": {
+        "name": "Operating mode",
+        "state": {
+          "off": "Off",
+          "on": "On",
+          "timers": "Timers"
+        }
+      }
     }
   },
   "services": {
