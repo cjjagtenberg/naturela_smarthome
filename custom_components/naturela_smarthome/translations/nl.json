@@ -59,6 +59,9 @@
       },
       "next_off": {
         "name": "Gepland uit"
+      },
+      "timer_program": {
+        "name": "Timerprogramma"
       }
     },
     "select": {
@@ -69,6 +72,11 @@
           "on": "Aan",
           "timers": "Timers"
         }
+      }
+    },
+    "binary_sensor": {
+      "timer_window": {
+        "name": "Timervenster"
       }
     }
   },

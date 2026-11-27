@@ -59,6 +59,9 @@
       },
       "next_off": {
         "name": "Scheduled off"
+      },
+      "timer_program": {
+        "name": "Timer programme"
       }
     },
     "select": {
@@ -69,6 +72,11 @@
           "on": "On",
           "timers": "Timers"
         }
+      }
+    },
+    "binary_sensor": {
+      "timer_window": {
+        "name": "Timer window"
       }
     }
   },

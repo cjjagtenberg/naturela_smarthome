@@ -163,3 +163,56 @@ STATUS_OPTIONS = [
     "Overheating",
     "Unknown",
 ]
+
+
+# Controller timer programme (v1.5.0).
+# The cloud object carries the controller's own ON/OFF timers in the field
+# "Alarms" (the web UI shows them under User settings -> Timers). Begin/End are
+# controller-local wall-clock times with a misleading "Z" suffix. DaysEnabled
+# is a bitmask, Monday = 1 ... Sunday = 64 (SmartHome.Days in the web UI).
+# TimerSFI / TimerNDate drive the "Timers: Stop: 14:00" line on the status
+# page: TimerN enum 0 = off, 1 = Start, 2 = Stop, 3 = Delay. "Stop" means the
+# stove is inside a timer slot that ends at TimerNDate; "Start" means it waits
+# for the next slot.
+TIMER_STATES = {0: "off", 1: "start", 2: "stop", 3: "delay"}
+DAY_NAMES = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+
+
+def _hhmm(value) -> str | None:
+    if not isinstance(value, str) or len(value) < 16:
+        return None
+    return value[11:16]
+
+
+def parse_timers(data: dict | None) -> list[dict]:
+    """Return the controller timers as a list of plain dicts."""
+    timers = []
+    for item in (data or {}).get("Alarms") or []:
+        if not isinstance(item, dict) or "Begin" not in item:
+            continue
+        mask = int(item.get("DaysEnabled") or 0)
+        timers.append(
+            {
+                "enabled": bool(item.get("Enabled")),
+                "begin": _hhmm(item.get("Begin")),
+                "end": _hhmm(item.get("End")),
+                "days": [d for i, d in enumerate(DAY_NAMES) if mask & (1 << i)],
+            }
+        )
+    return timers
+
+
+def timer_state(data: dict | None) -> str | None:
+    """off / start / stop / delay, or None if the field is missing."""
+    raw = (data or {}).get("TimerSFI")
+    if raw is None:
+        return None
+    try:
+        return TIMER_STATES.get(int(raw))
+    except (TypeError, ValueError):
+        return None
+
+
+def timer_next_change(data: dict | None) -> str | None:
+    """HH:MM of the next timer change (controller-local time)."""
+    return _hhmm((data or {}).get("TimerNDate"))

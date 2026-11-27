@@ -32,6 +32,16 @@
           "timers": "Таймери"
         }
       }
+    },
+    "sensor": {
+      "timer_program": {
+        "name": "Програма на таймерите"
+      }
+    },
+    "binary_sensor": {
+      "timer_window": {
+        "name": "Таймер разрешава горене"
+      }
     }
   }
 }
