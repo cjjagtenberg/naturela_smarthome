@@ -20,7 +20,18 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .verify import CommandVerifier
-from .const import CONF_DEVICE_ID, DOMAIN, MANUFACTURER, MODEL, STATE_OFF, STATE_ON, STATUS_NAMES
+from .const import (
+    CONF_DEVICE_ID,
+    DOMAIN,
+    MANUFACTURER,
+    MODE_OFF,
+    MODE_ON,
+    MODEL,
+    STATE_OFF,
+    STATUS_NAMES,
+    build_state,
+    get_mode,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -170,7 +181,7 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         """Update _attr_* from a data dict. Safe to call from __init__."""
         status = data.get("Status", 0)
         state  = data.get("State", STATE_OFF)
-        if status in ACTIVE_STATUSES or state == STATE_ON:
+        if status in ACTIVE_STATUSES or get_mode(state) != MODE_OFF:
             self._attr_hvac_mode = HVACMode.HEAT
         else:
             self._attr_hvac_mode = HVACMode.OFF
@@ -200,7 +211,8 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
             )
         else:
             # No pending command -- follow the API faithfully
-            if state == STATE_ON:
+            if get_mode(state) != MODE_OFF:
+                # ON and Timers both mean the controller is enabled
                 self._attr_hvac_mode = HVACMode.HEAT
             else:
                 self._attr_hvac_mode = HVACMode.OFF
@@ -265,7 +277,10 @@ class NaturelaClimate(CoordinatorEntity, ClimateEntity):
         self._attr_hvac_mode = hvac_mode
         self.async_write_ha_state()
 
-        state = STATE_ON if hvac_mode == HVACMode.HEAT else STATE_OFF
+        current = (self.coordinator.data or {}).get("State", STATE_OFF)
+        state = build_state(
+            MODE_ON if hvac_mode == HVACMode.HEAT else MODE_OFF, current
+        )
         try:
             success = await self._api.set_state(state)
             if success:

@@ -51,6 +51,25 @@ Control your **Naturela BurnerTouch pellet stove** from Home Assistant — via t
 | Thermostat | Input active |
 | External stop | Input active |
 
+### Operating mode (v1.5.0+)
+
+| Entity | Type | Description |
+|---|---|---|
+| Operating mode | `select` | `off` / `on` / `timers`, the same three modes as the Naturela web UI. `timers` hands control back to the timer programme stored on the controller. |
+
+The climate entity still offers OFF / HEAT. HEAT sends **ON**; the climate entity also shows HEAT while the controller is in **Timers** mode, because the stove is enabled in both. Use the select to go back to Timers.
+
+The controller's `State` field packs two values: bits 6–7 are the mode (0 = OFF, 2 = ON, 3 = Timers) and bits 0–1 are the fuel selection. Every command now keeps the fuel bits as they are, like the web UI does, so they are no longer reset to 0 on each ON/OFF.
+
+### Controller timers (v1.5.0+)
+
+| Entity | Type | Description |
+|---|---|---|
+| Timer programme | `sensor` | The controller's own ON/OFF timers, e.g. `00:00-14:00, 16:00-23:59`. Attributes: `timers` (enabled, begin, end, days), `timer_state`, `next_change`. |
+| Timer window | `binary_sensor` | On while the controller's timer programme allows burning (the web UI's "Timers: Stop: HH:MM"). |
+
+The cloud returns the timers in the `Alarms` field; `DaysEnabled` is a bitmask (Monday = 1 … Sunday = 64). `TimerSFI` / `TimerNDate` give the current timer state (0 off, 1 waiting for start, 2 running until stop, 3 delay) and the time of the next change, in controller-local time.
+
 ### Timer and schedule (v1.4.0+)
 
 | Entity | Type | Description |

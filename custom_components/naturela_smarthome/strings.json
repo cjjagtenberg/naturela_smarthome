@@ -59,6 +59,24 @@
       },
       "next_off": {
         "name": "Scheduled off"
+      },
+      "timer_program": {
+        "name": "Timer programme"
+      }
+    },
+    "select": {
+      "operating_mode": {
+        "name": "Operating mode",
+        "state": {
+          "off": "Off",
+          "on": "On",
+          "timers": "Timers"
+        }
+      }
+    },
+    "binary_sensor": {
+      "timer_window": {
+        "name": "Timer window"
       }
     }
   },

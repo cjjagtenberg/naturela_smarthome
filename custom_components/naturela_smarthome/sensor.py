@@ -24,6 +24,9 @@ from .const import (
     MODEL,
     STATUS_NAMES,
     STATUS_OPTIONS,
+    parse_timers,
+    timer_next_change,
+    timer_state,
 )
 
 from .schedule_entity import NaturelaScheduleEntity
@@ -211,6 +214,7 @@ async def async_setup_entry(
 
     entities: list[SensorEntity] = [
         NaturelaStatusSensor(coordinator, device_id),
+        NaturelaTimerProgramSensor(coordinator, device_id),
     ]
     entities += [
         NaturelaSensor(coordinator, device_id, desc)
@@ -426,3 +430,39 @@ class NaturelaScheduleSensor(NaturelaScheduleEntity, SensorEntity):
     @property
     def native_value(self):
         return self._scheduler.on_at if self._is_on else self._scheduler.off_at
+
+
+class NaturelaTimerProgramSensor(_NaturelaEntityBase, SensorEntity):
+    """The controller's own timer programme, e.g. "00:00-14:00, 16:00-23:59" (v1.5.0)."""
+
+    _attr_icon = "mdi:calendar-clock"
+    _attr_has_entity_name = True
+    _attr_translation_key = "timer_program"
+
+    def __init__(self, coordinator, device_id: int) -> None:
+        super().__init__(coordinator, device_id)
+        self._attr_unique_id = f"{DOMAIN}_{device_id}_timer_program"
+
+    @property
+    def native_value(self) -> str | None:
+        timers = parse_timers(self.coordinator.data)
+        if not timers:
+            return None
+        parts = []
+        for t in timers:
+            if not t["enabled"]:
+                continue
+            slot = f"{t['begin']}-{t['end']}"
+            if len(t["days"]) < 7:
+                slot += " (" + ",".join(t["days"]) + ")"
+            parts.append(slot)
+        return ", ".join(parts)[:255] if parts else "none"
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        data = self.coordinator.data
+        return {
+            "timers": parse_timers(data),
+            "timer_state": timer_state(data),
+            "next_change": timer_next_change(data),
+        }

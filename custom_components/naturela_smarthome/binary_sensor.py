@@ -13,7 +13,14 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import CONF_DEVICE_ID, DOMAIN, MANUFACTURER, MODEL
+from .const import (
+    CONF_DEVICE_ID,
+    DOMAIN,
+    MANUFACTURER,
+    MODEL,
+    timer_next_change,
+    timer_state,
+)
 
 
 @dataclass
@@ -82,6 +89,7 @@ async def async_setup_entry(
             NaturelaBinarySensor(data["coordinator"], device_id, desc)
             for desc in BINARY_SENSORS
         ]
+        + [NaturelaTimerWindowSensor(data["coordinator"], device_id)]
     )
 
 
@@ -112,3 +120,37 @@ class NaturelaBinarySensor(CoordinatorEntity, BinarySensorEntity):
         if not self.coordinator.data:
             return None
         return bool(self.coordinator.data.get(self.entity_description.api_key))
+
+
+class NaturelaTimerWindowSensor(CoordinatorEntity, BinarySensorEntity):
+    """On while the controller's timer programme allows burning (v1.5.0).
+
+    Follows the controller itself (TimerSFI): "stop" = inside a timer slot that
+    ends at next_change; "start"/"delay" = waiting; "off" = timers not in use.
+    """
+
+    _attr_has_entity_name = True
+    _attr_translation_key = "timer_window"
+    _attr_icon = "mdi:calendar-clock"
+
+    def __init__(self, coordinator, device_id: int) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{DOMAIN}_{device_id}_timer_window"
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, str(device_id))},
+            "name": "Pellet Stove",
+            "manufacturer": MANUFACTURER,
+            "model": MODEL,
+        }
+
+    @property
+    def is_on(self) -> bool | None:
+        state = timer_state(self.coordinator.data)
+        if state is None:
+            return None
+        return state == "stop"
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        data = self.coordinator.data
+        return {"timer_state": timer_state(data), "next_change": timer_next_change(data)}

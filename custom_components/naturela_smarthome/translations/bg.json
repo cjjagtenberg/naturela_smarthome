@@ -21,5 +21,27 @@
     "abort": {
       "already_configured": "Това устройство вече е konfigurirano"
     }
+  },
+  "entity": {
+    "select": {
+      "operating_mode": {
+        "name": "Режим на работа",
+        "state": {
+          "off": "Изкл.",
+          "on": "Вкл.",
+          "timers": "Таймери"
+        }
+      }
+    },
+    "sensor": {
+      "timer_program": {
+        "name": "Програма на таймерите"
+      }
+    },
+    "binary_sensor": {
+      "timer_window": {
+        "name": "Таймер разрешава горене"
+      }
+    }
   }
 }

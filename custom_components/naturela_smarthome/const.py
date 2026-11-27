@@ -63,6 +63,42 @@ API_URL, SET_STATE_URL, SET_TEMP_URL = build_api_urls(DEFAULT_CONTROLLER)
 STATE_OFF = 0
 STATE_ON  = 128
 
+# Operating mode (v1.5.0).
+# The "State" byte packs two fields, as decoded by the Naturela web UI
+# (applicationbundle.js, BurnerStatus / BurnerTouchStatus):
+#   onOffState = (State >> 6) & 3   -> 0 = OFF, 2 = ON, 3 = Timers
+#   fuelState  =  State       & 3   -> fuel selection, must be preserved
+# The web UI writes it back as (onOffState << 6) | fuelState.
+MODE_OFF = 0
+MODE_ON = 2
+MODE_TIMERS = 3
+MODE_SHIFT = 6
+MODE_MASK = 0b11
+FUEL_MASK = 0b11
+
+MODE_OPTIONS = {
+    "off": MODE_OFF,
+    "on": MODE_ON,
+    "timers": MODE_TIMERS,
+}
+
+
+def get_mode(state) -> int:
+    """Return the onOffState field of a raw State value (0 if unknown)."""
+    try:
+        return (int(state) >> MODE_SHIFT) & MODE_MASK
+    except (TypeError, ValueError):
+        return MODE_OFF
+
+
+def build_state(mode: int, current_state=0) -> int:
+    """Compose a State value for setState, keeping the current fuel bits."""
+    try:
+        fuel = int(current_state) & FUEL_MASK
+    except (TypeError, ValueError):
+        fuel = 0
+    return ((mode & MODE_MASK) << MODE_SHIFT) | fuel
+
 # Status code labels (v1.4.2).
 # Literal BurnStatus enum from the Naturela cloud frontend
 # (https://iot.naturela-bg.com/scripts/applicationbundle.js, pattern
@@ -127,3 +163,56 @@ STATUS_OPTIONS = [
     "Overheating",
     "Unknown",
 ]
+
+
+# Controller timer programme (v1.5.0).
+# The cloud object carries the controller's own ON/OFF timers in the field
+# "Alarms" (the web UI shows them under User settings -> Timers). Begin/End are
+# controller-local wall-clock times with a misleading "Z" suffix. DaysEnabled
+# is a bitmask, Monday = 1 ... Sunday = 64 (SmartHome.Days in the web UI).
+# TimerSFI / TimerNDate drive the "Timers: Stop: 14:00" line on the status
+# page: TimerN enum 0 = off, 1 = Start, 2 = Stop, 3 = Delay. "Stop" means the
+# stove is inside a timer slot that ends at TimerNDate; "Start" means it waits
+# for the next slot.
+TIMER_STATES = {0: "off", 1: "start", 2: "stop", 3: "delay"}
+DAY_NAMES = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+
+
+def _hhmm(value) -> str | None:
+    if not isinstance(value, str) or len(value) < 16:
+        return None
+    return value[11:16]
+
+
+def parse_timers(data: dict | None) -> list[dict]:
+    """Return the controller timers as a list of plain dicts."""
+    timers = []
+    for item in (data or {}).get("Alarms") or []:
+        if not isinstance(item, dict) or "Begin" not in item:
+            continue
+        mask = int(item.get("DaysEnabled") or 0)
+        timers.append(
+            {
+                "enabled": bool(item.get("Enabled")),
+                "begin": _hhmm(item.get("Begin")),
+                "end": _hhmm(item.get("End")),
+                "days": [d for i, d in enumerate(DAY_NAMES) if mask & (1 << i)],
+            }
+        )
+    return timers
+
+
+def timer_state(data: dict | None) -> str | None:
+    """off / start / stop / delay, or None if the field is missing."""
+    raw = (data or {}).get("TimerSFI")
+    if raw is None:
+        return None
+    try:
+        return TIMER_STATES.get(int(raw))
+    except (TypeError, ValueError):
+        return None
+
+
+def timer_next_change(data: dict | None) -> str | None:
+    """HH:MM of the next timer change (controller-local time)."""
+    return _hhmm((data or {}).get("TimerNDate"))

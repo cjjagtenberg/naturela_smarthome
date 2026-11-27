@@ -24,7 +24,7 @@ from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers.event import async_call_later
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN, STATE_OFF, STATE_ON, STATUS_NAMES
+from .const import DOMAIN, MODE_OFF, STATE_OFF, STATUS_NAMES, build_state
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -110,7 +110,8 @@ class CommandVerifier:
                 label, VERIFY_WINDOW, self._attempt, 1 + OFF_RETRIES, self._api.last_command,
             )
             await self._api.force_relogin()
-            await self._api.set_state(STATE_OFF)
+            current = (self._coordinator.data or {}).get("State", STATE_OFF)
+            await self._api.set_state(build_state(MODE_OFF, current))
             self._deadline = dt_util.utcnow() + timedelta(seconds=VERIFY_WINDOW)
             self._set_state(f"checking {self._attempt}/{1 + OFF_RETRIES}")
             self._schedule()
